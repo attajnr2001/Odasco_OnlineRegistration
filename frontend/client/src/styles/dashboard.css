@@ -1,0 +1,7 @@
+.info {
+  background: linear-gradient(to right, #2bd918, #fff);
+  color: #fff;
+  width: 240px;
+  padding: 0.3rem 1rem;
+  border-radius: 0.3rem;
+}

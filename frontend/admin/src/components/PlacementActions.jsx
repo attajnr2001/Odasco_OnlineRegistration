@@ -1,0 +1,447 @@
+import React, { useState, useEffect } from "react";
+import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
+import {
+  Button,
+  TextField,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Paper,
+  CircularProgress,
+  TableSortLabel,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import AddStudentModal from "../mod/AddStudentModal";
+import ImportStudentExcel from "../mod/ImportStudentExcel";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { visuallyHidden } from "@mui/utils";
+import { useLocationIP, getPlatform } from "../helpers/utils";
+import {
+  useGetStudentItemsQuery,
+  useAddStudentItemMutation,
+  useUpdateStudentItemMutation,
+  useDeleteStudentItemMutation,
+} from "../slices/studentApiSlice";
+import { useGetProgramItemsQuery } from "../slices/programApiSlice";
+
+const PlacementActions = () => {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [openAddStudentModal, setOpenAddStudentModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("");
+  const [openImportDialog, setOpenImportDialog] = useState(false);
+  const [order, setOrder] = useState("desc");
+  const [orderByIndex, setOrderBy] = useState("createdAt");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const locationIP = useLocationIP();
+
+  const {
+    data: studentItems,
+    isLoading,
+    isError,
+    error,
+  } = useGetStudentItemsQuery();
+  const [deleteStudentItem] = useDeleteStudentItemMutation();
+
+  const { data: programs, isLoading: programsLoading } =
+    useGetProgramItemsQuery();
+  const getProgramName = (programId) => {
+    if (!programs) return "Loading...";
+    const program = programs.find((p) => p._id === programId);
+    return program ? program.name : "Unknown Program";
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value.toLowerCase());
+  };
+
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <Alert severity="error">{error.message}</Alert>
+      </div>
+    );
+  }
+
+  const handleImportButtonClick = () => {
+    setOpenImportDialog(true);
+  };
+
+  const handlePDFExport = async () => {
+    try {
+      const currentUser = true;
+
+      const doc = new jsPDF();
+      doc.text("Students List", 20, 10);
+      doc.autoTable({
+        head: [
+          [
+            "Index Number",
+            "Student Name",
+            "JHS Attended",
+            "Aggregate",
+            "Program",
+            "Year",
+            "Status",
+          ],
+        ],
+        body: filteredStudents.map((student) => [
+          student.indexNumber,
+          `${student.otherNames} ${student.surname}`,
+          student.aggregate,
+          getProgramName(student.program),
+          student.year,
+          student.status,
+        ]),
+      });
+
+      doc.save("students.pdf");
+      // Fetch current datetime from World Time API
+      const response = await fetch(
+        "http://worldtimeapi.org/api/timezone/Africa/Accra"
+      );
+      const data = await response.json();
+      const dateTimeString = data.datetime;
+
+      // Log the addition of a new house
+    } catch (error) {
+      console.log("Error downloading list", error);
+    }
+  };
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderByIndex === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  const filteredStudents = studentItems.filter((student) => {
+    const fullName = `${student.otherNames} ${student.surname}`.toLowerCase();
+    const programName = getProgramName(student.program).toLowerCase();
+    return fullName.includes(searchQuery) || programName.includes(searchQuery);
+  });
+
+  const getComparator = (order, orderByIndex) => {
+    return order === "desc"
+      ? (a, b) => descendingComparator(a, b, orderByIndex)
+      : (a, b) => -descendingComparator(a, b, orderByIndex);
+  };
+
+  const descendingComparator = (a, b, orderByIndex) => {
+    if (b[orderByIndex] < a[orderByIndex]) {
+      return -1;
+    }
+    if (b[orderByIndex] > a[orderByIndex]) {
+      return 1;
+    }
+    return 0;
+  };
+
+  const stableSort = (array, comparator) => {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  };
+
+  const sortedStudents = stableSort(
+    filteredStudents,
+    getComparator(order, orderByIndex)
+  );
+
+  const handleDeleteUnregisteredStudents = async () => {
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = async (confirm) => {
+    setOpenDialog(false);
+    if (confirm) {
+      try {
+        const currentUser = true;
+
+        // Fetch current datetime from World Time API
+        const response = await fetch(
+          "http://worldtimeapi.org/api/timezone/Africa/Accra"
+        );
+        const data = await response.json();
+        const dateTimeString = data.datetime;
+        const dateTimeParts = dateTimeString.split(/[+\-]/);
+        const dateTime = new Date(`${dateTimeParts[0]} UTC${dateTimeParts[1]}`);
+        // Subtract one hour from the datetime
+        dateTime.setHours(dateTime.getHours() - 1);
+
+        // Log the addition of a new house
+
+        console.log("Unregistered students deleted successfully!");
+        // Show success snackbar
+        setSnackbarMessage("Unregistered students deleted successfully!");
+        setSnackbarOpen(true);
+        setAlertSeverity("success");
+      } catch (error) {
+        console.error("Error deleting unregistered students:", error);
+        // Show error snackbar
+        setSnackbarMessage(
+          "Error deleting unregistered students: " + error.message
+        );
+        setSnackbarOpen(true);
+        setAlertSeverity("error"); // Should be "error" instead of "success"
+      }
+    }
+  };
+
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+
+  const currentPageData = sortedStudents.slice(startIndex, endIndex);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // reset page to 0 when rows per page changes
+  };
+
+  return (
+    <div>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setOpenAddStudentModal(true)}
+          >
+            Add New Single Record
+          </Button>
+        </Grid>
+
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick={handleImportButtonClick}
+          >
+            Import from CSSPS Excel
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handlePDFExport}
+          >
+            Download Previously Imported List
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={handleDeleteUnregisteredStudents}
+          >
+            Delete All Unregistered Placement
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid
+        container
+        alignItems="center"
+        style={{ marginTop: "1rem" }}
+        spacing={1}
+      >
+        <Grid item xs={12}>
+          <TextField
+            label="Search student by name"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </Grid>
+      </Grid>
+      <TableContainer
+        component={Paper}
+        sx={{ marginTop: "1em", whiteSpace: "nowrap" }}
+      >
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                Index Number
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableSortLabel
+                  active={orderByIndex === "surname"}
+                  direction={orderByIndex === "surname" ? order : "asc"}
+                  onClick={(event) => handleRequestSort(event, "surname")}
+                >
+                  Student Name
+                  {orderByIndex === "surname" ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {order === "desc"
+                        ? "sorted descending"
+                        : "sorted ascending"}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
+              </TableCell>
+
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                Aggregate
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                Program
+              </TableCell>
+
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                Status
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableSortLabel
+                  active={orderByIndex === "completed"}
+                  direction={orderByIndex === "completed" ? order : "asc"}
+                  onClick={(event) => handleRequestSort(event, "completed")}
+                >
+                  Registered
+                  {orderByIndex === "completed" ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {order === "desc"
+                        ? "sorted descending"
+                        : "sorted ascending"}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {currentPageData.map((student, index) => (
+              <TableRow key={index}>
+                <TableCell align="center">{student.indexNumber}</TableCell>
+                <TableCell align="center">{`${student.otherNames} ${student.surname}`}</TableCell>
+                <TableCell align="center">{student.aggregate}</TableCell>
+                <TableCell align="center">
+                  {getProgramName(student.program)}
+                </TableCell>
+                <TableCell align="center">{student.status}</TableCell>
+                <TableCell align="center">
+                  {student.completed ? "Yes" : "No"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 20, 50]}
+        component="div"
+        count={sortedStudents.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+      <AddStudentModal
+        open={openAddStudentModal}
+        onClose={() => setOpenAddStudentModal(false)}
+      />
+      <ImportStudentExcel
+        open={openImportDialog}
+        onClose={() => setOpenImportDialog(false)}
+        programs={programs}
+      />
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity={alertSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
+      <Dialog
+        open={openDialog}
+        onClose={(event, reason) => {
+          if (reason !== "backdropClick") {
+            handleDialogClose(false);
+          }
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete all unregistered students?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleDialogClose(false)}>Cancel</Button>
+          <Button onClick={() => handleDialogClose(true)}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
+      <NetworkStatusWarning />
+    </div>
+  );
+};
+
+// Utility functions for sorting
+function descendingComparator(a, b, orderByIndex) {
+  if (b[orderByIndex] < a[orderByIndex]) {
+    return -1;
+  }
+  if (b[orderByIndex] > a[orderByIndex]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderByIndex) {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderByIndex)
+    : (a, b) => -descendingComparator(a, b, orderByIndex);
+}
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
+export default PlacementActions;
