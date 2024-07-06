@@ -11,6 +11,10 @@ import { useParams } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import { useLocationIP, getPlatform } from "../helpers/utils";
 import { storage } from "../helpers/firebase"; // Make sure to import your Firebase storage instance
+import {
+  useGetSchoolItemsQuery,
+  useUpdateSchoolItemMutation,
+} from "../slices/schoolApiSlice";
 
 const Undertaking = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -19,6 +23,8 @@ const Undertaking = () => {
   const locationIP = useLocationIP();
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
+  const { data: schoolItems, isLoading, error } = useGetSchoolItemsQuery();
+  const [updateSchoolItem] = useUpdateSchoolItemMutation();
 
   const resetSuccessMessage = () => {
     setTimeout(() => {
@@ -80,12 +86,9 @@ const Undertaking = () => {
     setUploadError(null);
 
     try {
-      // Delete all existing files in the undertaking folder
       await deleteAllUndertakingFiles();
 
       const storageRef = ref(storage, `undertaking/${selectedFile.name}`);
-
-      // Upload the new file to Firebase Storage
       const uploadTask = uploadBytesResumable(storageRef, selectedFile);
 
       uploadTask.on(
@@ -101,13 +104,35 @@ const Undertaking = () => {
           setLoading(false);
         },
         async () => {
-          // Upload completed successfully, now we can get the download URL
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setUndertakingURL(downloadURL);
-          setSuccessMessage("Undertaking uploaded successfully!");
-          resetSuccessMessage();
-          setLoading(false);
-          setSelectedFile(null);
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+            if (schoolItems && schoolItems.length > 0) {
+              const schoolId = schoolItems[0]._id;
+              const result = await updateSchoolItem({
+                id: schoolId,
+                undertaking: downloadURL,
+              });
+
+              if (result.error) {
+                throw new Error("Failed to update school record");
+              }
+
+              setUndertakingURL(downloadURL);
+              setSuccessMessage(
+                "Undertaking uploaded and school record updated successfully!"
+              );
+            } else {
+              throw new Error("No school found to update");
+            }
+          } catch (error) {
+            console.error("Error updating school record:", error);
+            setUploadError("Error updating school record. Please try again.");
+          } finally {
+            setLoading(false);
+            setSelectedFile(null);
+            resetSuccessMessage();
+          }
         }
       );
     } catch (error) {
@@ -117,37 +142,56 @@ const Undertaking = () => {
     }
   };
 
+  useEffect(() => {
+    if (schoolItems && schoolItems.length > 0) {
+      setUndertakingURL(schoolItems[0].undertaking);
+    }
+  }, [schoolItems]);
+
   return (
     <div className="file">
-      {undertakingURL && (
-        <a
-          href={undertakingURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          download
-        >
-          Download Undertaking
-        </a>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <Alert severity="error">Error loading school data</Alert>
+      ) : (
+        <>
+          {undertakingURL && (
+            <a
+              href={undertakingURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+            >
+              Download Undertaking
+            </a>
+          )}
+          <p className="newFile">Upload New Undertaking File</p>
+          <Input
+            type="file"
+            onChange={handleFileChange}
+            sx={{ my: 1, mr: 1 }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleUpload}
+            size="small"
+            sx={{ mb: 2 }}
+            disabled={!selectedFile || loading}
+          >
+            {loading ? "Uploading..." : "Save"}
+          </Button>
+          <br />
+          {uploadError && <Alert severity="error">{uploadError}</Alert>}
+          {successMessage && (
+            <Alert severity="success">
+              <AlertTitle>Success</AlertTitle>
+              {successMessage}
+            </Alert>
+          )}
+        </>
       )}
-      <p className="newFile">Upload New Undertaking File</p>
-      <Input type="file" onChange={handleFileChange} sx={{ my: 1, mr: 1 }} />
-      <Button
-        variant="contained"
-        onClick={handleUpload}
-        size="small"
-        sx={{ mb: 2 }}
-        disabled={!selectedFile || loading}
-      >
-        {loading ? "Uploading..." : "Save"}
-      </Button>
-      <br />
-      {uploadError && <Alert severity="error">{uploadError}</Alert>}
-      {successMessage && (
-        <Alert severity="success">
-          <AlertTitle>Success</AlertTitle>
-          {successMessage}
-        </Alert>
-      )}
+
       <NetworkStatusWarning />
     </div>
   );

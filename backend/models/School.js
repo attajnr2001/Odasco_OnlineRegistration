@@ -103,6 +103,15 @@ const schoolSchema = mongoose.Schema(
     notes: {
       type: String,
     },
+    prospectus: {
+      type: String,
+    },
+    undertaking: {
+      type: String,
+    },
+    logo: {
+      type: String,
+    },
   },
   {
     timestamps: true,

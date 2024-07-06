@@ -269,7 +269,7 @@ const ManageStudent = () => {
             {slicedStudents.map((student, index) => (
               <TableRow key={index}>
                 <TableCell align="center">
-                  <Avatar src={student.image ? student.image : ""} />
+                  <Avatar src={student.photo ? student.photo : ""} />
                 </TableCell>
                 <TableCell align="center">{student.indexNumber}</TableCell>
                 <TableCell align="center">

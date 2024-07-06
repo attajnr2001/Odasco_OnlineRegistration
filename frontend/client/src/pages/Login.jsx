@@ -124,12 +124,12 @@ const Login = () => {
 
   const school = schoolItems?.[0];
 
-  useEffect(() => {
-    if (clientInfo) {
-      navigate(`/dashboard/`);
-    } else {
-    }
-  }, [navigate, clientInfo]);
+  // useEffect(() => {
+  //   if (clientInfo) {
+  //     navigate(`/dashboard/`);
+  //   } else {
+  //   }
+  // }, [navigate, clientInfo]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -147,7 +147,11 @@ const Login = () => {
         payment(res);
       } else {
         dispatch(setCredentials({ ...res }));
-        navigate(`/dashboard`);
+        if (res.completed) {
+          navigate(`/dashboard`);
+        } else {
+          navigate(`/dashboard/edit-student`);
+        }
       }
     } catch (err) {
       setError(err?.data?.message || err.error || "Login failed");

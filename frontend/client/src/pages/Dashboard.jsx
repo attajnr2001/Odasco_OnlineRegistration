@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Avatar, Typography, Button, Grid, Paper } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import jsPDF from "jspdf";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TaskIcon from "@mui/icons-material/Task";
@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetStudentDetailsMutation } from "../slices/clientApiSlice";
 import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 import { useGetHouseItemsQuery } from "../slices/houseApiSlice";
+import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -42,8 +44,12 @@ const Dashboard = () => {
   const [getStudentDetails] = useGetStudentDetailsMutation();
   const { data: programs, isLoading: programsLoading } =
     useGetProgramItemsQuery();
+  const storage = getStorage();
+  const logoRef = ref(storage, "school/osco.jpg");
 
   const { data: houses, isLoading: housesLoading } = useGetHouseItemsQuery();
+  const { data: schoolItems, isLoading: schoolLoading } =
+    useGetSchoolItemsQuery();
 
   const getProgramName = (programId) => {
     if (!programs) return "Loading...";
@@ -61,6 +67,54 @@ const Dashboard = () => {
     if (!programs) return "...";
     const program = programs.find((p) => p._id === programId);
     return program ? program.shortName : "Unknown";
+  };
+
+  const getSchoolData = () => {
+    if (!schoolItems || schoolItems.length === 0) return null;
+    return schoolItems[0]; // Assuming there's only one school
+  };
+
+  const generateAdmissionLetter = () => {
+    const doc = new jsPDF();
+    const schoolData = getSchoolData();
+
+    // Add school logo
+
+    getDownloadURL(logoRef)
+      .then((url) => {
+        // Use this URL in your PDF generation
+      })
+      .catch((error) => {
+        console.error("Error getting download URL:", error);
+      });
+      
+    if (schoolData && schoolData.logo) {
+      doc.addImage(schoolData.logo, "JPEG", 10, 10, 50, 50);
+    }
+
+    doc.setFontSize(18);
+    doc.text("Admission Letter", 105, 20, null, null, "center");
+
+    doc.setFontSize(12);
+    doc.text(`Student Name: ${student.otherNames} ${student.surname}`, 20, 40);
+    doc.text(
+      `Student Number: ${getProgramShortName(student.program)}${student.year}${
+        student.admissionNo
+      }`,
+      20,
+      50
+    );
+    doc.text(`Program: ${getProgramName(student.program)}`, 20, 60);
+    doc.text(`Year: ${student.year}`, 20, 70);
+
+    // Add student photo
+    if (student.photo) {
+      doc.addImage(student.photo, "JPEG", 150, 40, 40, 40);
+    }
+
+    // Add more fields as needed
+
+    doc.save("admission_letter.pdf");
   };
 
   useEffect(() => {
@@ -224,8 +278,17 @@ const Dashboard = () => {
 
         <Grid item xs={12} sx={{ mt: 4 }}>
           <LeftAlignedItem>
-            <a href={"prospectus"} target="_blank" download>
-              <Button variant="outlined" color="primary">
+            <a
+              href={getSchoolData()?.prospectus}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                disabled={!getSchoolData()?.prospectus}
+              >
                 <ArticleIcon />
                 Download Prospectus
               </Button>
@@ -236,7 +299,7 @@ const Dashboard = () => {
           <LeftAlignedItem>
             <Button
               variant="outlined"
-              //   onClick={handleGenerateAdmissionLetter}
+              onClick={generateAdmissionLetter}
               color="error"
             >
               <TaskIcon />
@@ -258,24 +321,32 @@ const Dashboard = () => {
         </Grid>
         <Grid item xs={12}>
           <LeftAlignedItem>
-            <a href={"undertaking"} target="_blank" download>
-              <Button variant="outlined" color="success">
+            <a
+              href={getSchoolData()?.undertaking}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+            >
+              <Button
+                variant="outlined"
+                color="success"
+                disabled={!getSchoolData()?.undertaking}
+              >
                 <InsertDriveFileIcon />
                 Download Undertaking
               </Button>
             </a>
           </LeftAlignedItem>
-
-          <h5
-            style={{
-              margin: "1rem 0",
-            }}
-          >
-            Instructions:
-          </h5>
-
-          <ol style={{ margin: "1em 0" }}></ol>
         </Grid>
+        <h5
+          style={{
+            margin: "1rem 0",
+          }}
+        >
+          Instructions:
+        </h5>
+
+        <ol style={{ margin: "1em 0" }}></ol>
       </Grid>
       <NetworkStatusWarning />
     </>

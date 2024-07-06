@@ -108,11 +108,15 @@ const updateSchoolItem = asyncHandler(async (req, res) => {
     UndertakingMedicalCaption,
     programSubjectCaption,
     notes,
+    prospectus,
+    undertaking,
   } = req.body;
 
   const schoolItem = await School.findById(req.params.id);
 
   if (schoolItem) {
+    schoolItem.prospectus = prospectus || schoolItem.prospectus;
+    schoolItem.undertaking = undertaking || schoolItem.undertaking;
     schoolItem.personalRecordsCaption =
       personalRecordsCaption || schoolItem.personalRecordsCaption;
     schoolItem.UndertakingMedicalCaption =

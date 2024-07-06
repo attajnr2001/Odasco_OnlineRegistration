@@ -32,6 +32,7 @@ const studentSchema = mongoose.Schema(
     indexNumber: {
       type: String,
       required: true,
+      unique: true,
     },
     jhsAttended: {
       type: String,

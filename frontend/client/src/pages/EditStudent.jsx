@@ -123,18 +123,6 @@ const EditStudent = () => {
   };
 
   // uploading student profile picture in firestore
-  const uploadImage = () => {
-    if (file.size > 2 * 1024 * 1024) {
-      setSnackbarMessage("File is too large. Maximum size is 2MB.");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
-      setFile(null);
-      return;
-    }
-  };
-
-  // uploads enrollment form of student into the firestore
-  const uploadForm = () => {};
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -156,6 +144,13 @@ const EditStudent = () => {
   const handleSaveChanges = async () => {
     try {
       setIsSaving(true);
+
+      if (!student.hasPaid) {
+        setSnackbarMessage("Please Make payment first");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+        return;
+      }
 
       let photoURL = photo;
       let enrollmentFormURL = enrollmentForm;
@@ -230,6 +225,7 @@ const EditStudent = () => {
 
       // Optionally, you can update the local state with the returned data
       setStudent(result);
+      navigate("/dashboard");
     } catch (err) {
       setSnackbarMessage("Failed to update student information");
       setSnackbarSeverity("error");
@@ -421,26 +417,10 @@ const EditStudent = () => {
 
         <p className="title">PERSONAL RECORDS</p>
 
-        <TextField
-          label="House"
-          name="house"
-          select
-          value={selectedHouse}
-          onChange={(e) => setSelectedHouse(e.target.value)}
-          fullWidth
-          margin="normal"
-        >
-          {houses.map((house) => (
-            <MenuItem key={house.id} value={house.id}>
-              {house.name}
-            </MenuItem>
-          ))}
-        </TextField>
-
         <div>
           <Avatar
             sx={{ width: "100px", height: "100px", marginBottom: "10px" }}
-            src={previewURL || photo || ""}
+            src={previewURL || student.photo || ""}
             alt="Student Photo"
           />
           <input
