@@ -61,7 +61,6 @@ const getStudentDetails = asyncHandler(async (req, res) => {
   const student = await Student.findById(req.params.id).select(
     "hasPaid otherNames surname indexNumber gender admissionNo year completed program status house aggregate jhsAttended photo"
   );
-  console.log("Found student:", student);
   if (student) {
     res.json(student);
   } else {

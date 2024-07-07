@@ -51,6 +51,35 @@ const Dashboard = () => {
   const { data: schoolItems, isLoading: schoolLoading } =
     useGetSchoolItemsQuery();
 
+  // In your React component
+  const generateAdmissionLetter = async () => {
+    try { 
+      const response = await fetch("/api/pdf/generate-admission-letter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ studentId: student._id }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "admission_letter.pdf";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error("Failed to generate admission letter");
+      }
+    } catch (error) {
+      console.error("Error generating admission letter:", error);
+    }
+  };
+
   const getProgramName = (programId) => {
     if (!programs) return "Loading...";
     const program = programs.find((p) => p._id === programId);
@@ -72,49 +101,6 @@ const Dashboard = () => {
   const getSchoolData = () => {
     if (!schoolItems || schoolItems.length === 0) return null;
     return schoolItems[0]; // Assuming there's only one school
-  };
-
-  const generateAdmissionLetter = () => {
-    const doc = new jsPDF();
-    const schoolData = getSchoolData();
-
-    // Add school logo
-
-    getDownloadURL(logoRef)
-      .then((url) => {
-        // Use this URL in your PDF generation
-      })
-      .catch((error) => {
-        console.error("Error getting download URL:", error);
-      });
-      
-    if (schoolData && schoolData.logo) {
-      doc.addImage(schoolData.logo, "JPEG", 10, 10, 50, 50);
-    }
-
-    doc.setFontSize(18);
-    doc.text("Admission Letter", 105, 20, null, null, "center");
-
-    doc.setFontSize(12);
-    doc.text(`Student Name: ${student.otherNames} ${student.surname}`, 20, 40);
-    doc.text(
-      `Student Number: ${getProgramShortName(student.program)}${student.year}${
-        student.admissionNo
-      }`,
-      20,
-      50
-    );
-    doc.text(`Program: ${getProgramName(student.program)}`, 20, 60);
-    doc.text(`Year: ${student.year}`, 20, 70);
-
-    // Add student photo
-    if (student.photo) {
-      doc.addImage(student.photo, "JPEG", 150, 40, 40, 40);
-    }
-
-    // Add more fields as needed
-
-    doc.save("admission_letter.pdf");
   };
 
   useEffect(() => {
