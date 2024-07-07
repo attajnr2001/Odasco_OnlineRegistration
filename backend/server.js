@@ -9,8 +9,9 @@ import houseRoutes from "./routes/houseRoutes.js";
 import programRoutes from "./routes/programRoutes.js";
 import schoolRoutes from "./routes/schoolRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
-import clientRoutes from "./routes/clientRoutes.js"; 
-import pdfRoutes from './routes/pdfRoutes.js';
+import clientRoutes from "./routes/clientRoutes.js";
+import logRoutes from "./routes/logRoutes.js";
+import pdfRoutes from "./routes/pdfRoutes.js";
 
 const port = process.env.PORT || 5000;
 connectDB();
@@ -27,7 +28,8 @@ app.use("/api/programs", programRoutes);
 app.use("/api/schools", schoolRoutes);
 app.use("/api/students", studentRoutes);
 
-app.use("/api/clients", clientRoutes); 
-app.use('/api/pdf', pdfRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/pdf", pdfRoutes);
+app.use("/api/logs", logRoutes);
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

@@ -41,13 +41,10 @@ const Houses = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
-  const [loading, setLoading] = useState(true);
   const locationIP = useLocationIP();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [updating, setUpdating] = useState(false);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
   const [page, setPage] = useState(0);

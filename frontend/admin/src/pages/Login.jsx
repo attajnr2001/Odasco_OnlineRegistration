@@ -1,5 +1,4 @@
-import { useContext, useState, useEffect } from "react";
-import { auth, db } from "../helpers/firebase";
+import { useState, useEffect } from "react";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
@@ -13,11 +12,12 @@ import {
 import { Visibility, VisibilityOff, Person } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP } from "../helpers/utils";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
 import { useDispatch, useSelector } from "react-redux";
 import { useLoginMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
+import { useCreateLogItemMutation } from "../slices/logApiSlice";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,8 +25,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const locationIP = useLocationIP();
+  const [createLogItem] = useCreateLogItemMutation();
+  const { locationIP, loading: ipLoading } = useLocationIP();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,6 +51,18 @@ const Login = () => {
       const res = await login({ email, password }).unwrap();
       if (res.status === "active") {
         dispatch(setCredentials({ ...res }));
+
+        if (!ipLoading) {
+          const logsDetails = await createLogItem({
+            action: "User Login",
+            user: res._id,
+            locationIP: locationIP || "Unknown",
+          });
+          console.log(logsDetails);
+        } else {
+          console.log("IP address not available yet");
+        }
+
         navigate(`/admin/dashboard/placement-actions`);
       } else {
         setError("Your account is inactive. Please contact the administrator.");

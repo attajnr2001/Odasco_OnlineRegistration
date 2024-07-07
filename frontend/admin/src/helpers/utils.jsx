@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export const useLocationIP = () => {
   const [locationIP, setLocationIP] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLocationIP = async () => {
@@ -12,13 +13,14 @@ export const useLocationIP = () => {
         setLocationIP(data.ip);
       } catch (error) {
         console.error("Error fetching location IP:", error);
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchLocationIP();
   }, []);
 
-  return locationIP;
+  return { locationIP, loading };
 };
 
 // Function to get the platform type

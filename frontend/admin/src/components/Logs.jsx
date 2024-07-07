@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
-
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -18,6 +17,11 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { format, parseISO } from "date-fns";
+import * as XLSX from "xlsx";
+import Papa from "papaparse";
+import { useGetLogItemsQuery } from "../slices/logApiSlice";
+import { useLocationIP, getPlatform } from "../helpers/utils";
+
 
 const Logs = () => {
   const { schoolID } = "schoolID";
@@ -25,31 +29,9 @@ const Logs = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: logItems, isLoading, isError, error } = useGetLogItemsQuery();
 
-  const getCurrentTime = async () => {
-    const response = await fetch(
-      "http://worldtimeapi.org/api/timezone/Africa/Accra"
-    );
-    const data = await response.json();
-    const currentTime = new Date(data.datetime);
-    return currentTime;
-  };
-
-  useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-      } catch (error) {
-        console.error("Error fetching logs:", error);
-        setError(error);
-        setLoading(false);
-      }
-    };
-
-    fetchLogs();
-  }, [schoolID]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="loading-container">
         <CircularProgress />
@@ -80,16 +62,12 @@ const Logs = () => {
     const doc = new jsPDF();
     doc.text("Activity Log", 20, 10);
     doc.autoTable({
-      head: [
-        ["Username", "Date", "Time", "Action", "Location IP", "Platform Used"],
-      ],
+      head: [["Username", "Date Time", "Action", "Location IP"]],
       body: logs.map((log) => [
-        log.adminFullName,
+        log.username,
         log.formattedDate,
-        log.formattedTime,
         log.action,
         log.locationIP,
-        log.platform,
       ]),
     });
     doc.save("activity-log.pdf");
@@ -97,7 +75,7 @@ const Logs = () => {
 
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const slicedLogs = logs.slice(startIndex, endIndex);
+  const slicedLogs = logItems.slice(startIndex, endIndex);
 
   return (
     <div>
@@ -115,21 +93,17 @@ const Logs = () => {
             <TableRow>
               <TableCell>Username</TableCell>
               <TableCell>Date</TableCell>
-              <TableCell>Time</TableCell>
               <TableCell>Action</TableCell>
               <TableCell>Location IP</TableCell>
-              <TableCell>Platform Used</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {slicedLogs.map((log) => (
               <TableRow key={log.id}>
-                <TableCell>{log.adminFullName}</TableCell>
-                <TableCell>{log.formattedDate}</TableCell>
-                <TableCell>{log.formattedTime}</TableCell>
+                <TableCell>{log.user}</TableCell>
+                <TableCell>{log.createdAt}</TableCell>
                 <TableCell>{log.action}</TableCell>
                 <TableCell>{log.locationIP}</TableCell>
-                <TableCell>{log.platform}</TableCell>
               </TableRow>
             ))}
           </TableBody>
