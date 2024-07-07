@@ -5,7 +5,7 @@ import { readFile } from "fs/promises";
 const serviceAccount = JSON.parse(
   await readFile(
     new URL(
-      "./shsreg-bb2a1-firebase-adminsdk-wzyp7-632007a974.json",
+      "./utils/shsreg-bb2a1-firebase-adminsdk-wzyp7-632007a974.json",
       import.meta.url
     )
   )
@@ -13,7 +13,7 @@ const serviceAccount = JSON.parse(
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "shsreg-bb2a1.appspot.com",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 export const storage = admin.storage();

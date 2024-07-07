@@ -45,7 +45,6 @@ const Dashboard = () => {
   const { data: programs, isLoading: programsLoading } =
     useGetProgramItemsQuery();
   const storage = getStorage();
-  const logoRef = ref(storage, "school/osco.jpg");
 
   const { data: houses, isLoading: housesLoading } = useGetHouseItemsQuery();
   const { data: schoolItems, isLoading: schoolLoading } =
@@ -53,7 +52,7 @@ const Dashboard = () => {
 
   // In your React component
   const generateAdmissionLetter = async () => {
-    try { 
+    try {
       const response = await fetch("/api/pdf/generate-admission-letter", {
         method: "POST",
         headers: {
@@ -102,6 +101,8 @@ const Dashboard = () => {
     if (!schoolItems || schoolItems.length === 0) return null;
     return schoolItems[0]; // Assuming there's only one school
   };
+
+  const schoolData = getSchoolData();
 
   useEffect(() => {
     const fetchStudentDetails = async () => {
@@ -197,7 +198,6 @@ const Dashboard = () => {
             </Typography>
           </Item>
         </Grid>
-
         <Grid item xs={12} md={8}>
           <Grid
             container
@@ -261,7 +261,6 @@ const Dashboard = () => {
             </Grid>
           </Grid>
         </Grid>
-
         <Grid item xs={12} sx={{ mt: 4 }}>
           <LeftAlignedItem>
             <a
@@ -324,15 +323,21 @@ const Dashboard = () => {
             </a>
           </LeftAlignedItem>
         </Grid>
-        <h5
-          style={{
-            margin: "1rem 0",
-          }}
-        >
-          Instructions:
-        </h5>
 
-        <ol style={{ margin: "1em 0" }}></ol>
+        <div>
+          <h5
+            style={{
+              margin: "1rem 0",
+            }}
+          >
+            Announcements:
+          </h5>
+          <ol style={{ margin: "1em 0" }}>
+            {schoolData.announcement.map((announcement, index) => (
+              <li key={index}>{announcement}</li>
+            ))}
+          </ol>
+        </div>
       </Grid>
       <NetworkStatusWarning />
     </>
