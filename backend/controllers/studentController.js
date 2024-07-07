@@ -10,6 +10,28 @@ const getStudentItems = asyncHandler(async (req, res) => {
   res.json(studentItems);
 });
 
+const getRecentStudents = asyncHandler(async (req, res) => {
+  const mostRecent = await Student.findOne().sort("-createdAt");
+  if (!mostRecent) {
+    return res.json([]);
+  }
+
+  const mostRecentDate = new Date(mostRecent.createdAt);
+  mostRecentDate.setHours(0, 0, 0, 0); // Set time to beginning of the day
+
+  const nextDay = new Date(mostRecentDate);
+  nextDay.setDate(nextDay.getDate() + 1);
+
+  const recentStudents = await Student.find({
+    createdAt: {
+      $gte: mostRecentDate,
+      $lt: nextDay,
+    },
+  }).sort("-createAt");
+
+  res.json(recentStudents);
+});
+
 const getStudentCompletedItems = asyncHandler(async (req, res) => {
   const studentItems = await Student.find({ completed: false });
   res.json(studentItems);
@@ -161,9 +183,27 @@ const deleteStudentItem = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Delete all unregistered students
+// @route   DELETE /api/students/unregistered
+// @access  Private
+const deleteUnregisteredStudents = asyncHandler(async (req, res) => {
+  const result = await Student.deleteMany({ completed: false });
+
+  if (result.deletedCount > 0) {
+    res.json({
+      message: `${result.deletedCount} unregistered students deleted`,
+    });
+  } else {
+    res.status(404);
+    throw new Error("No unregistered students found");
+  }
+});
+
 export {
   getStudentItems,
   createStudentItem,
   updateStudentItem,
   deleteStudentItem,
+  getRecentStudents,
+  deleteUnregisteredStudents,
 };

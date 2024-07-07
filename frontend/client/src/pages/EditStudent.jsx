@@ -28,13 +28,13 @@ import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 import { useGetHouseItemsQuery } from "../slices/houseApiSlice";
 import { useUpdateStudentItemMutation } from "../slices/studentApiSlice";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useUpdateHouseItemMutation } from "../slices/houseApiSlice";
 import { storage } from "../helpers/firebase";
 
 const EditStudent = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const { schoolID, studentID } = useParams();
   const [indexNumber, setIndexNumber] = useState("");
   const [selectedHouse, setSelectedHouse] = useState("");
   const [rawScore, setRawScore] = useState("");
@@ -69,9 +69,8 @@ const EditStudent = () => {
   const [form, setForm] = useState(null);
   const [previewURL, setPreviewURL] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [admissionData, setAdmissionData] = useState({});
   const [showPersonalRecords, setShowPersonalRecords] = useState(false);
-  const [photoUploaded, setPhotoUploaded] = useState(true); // New state to track photo upload
+  const [photoUploaded, setPhotoUploaded] = useState(true); // New state
   const navigate = useNavigate();
   const [updateStudentItem, { isLoading: isUpdating }] =
     useUpdateStudentItemMutation();
@@ -83,6 +82,7 @@ const EditStudent = () => {
     useGetProgramItemsQuery();
 
   const { data: houses, isLoading: housesLoading } = useGetHouseItemsQuery();
+  const [updateHouseItem] = useUpdateHouseItemMutation();
 
   const getProgramName = (programId) => {
     if (!programs) return "Loading...";
@@ -171,7 +171,6 @@ const EditStudent = () => {
 
       let houseToAssign = selectedHouse;
 
-      // If the student's house is empty, assign a random house based on gender
       if (!houseToAssign) {
         const matchingHouses = houses.filter(
           (house) => house.gender === student.gender
@@ -218,6 +217,18 @@ const EditStudent = () => {
       };
 
       const result = await updateStudentItem(updatedStudentData).unwrap();
+      
+      if (houseToAssign) {
+        const assignedHouse = houses.find(
+          (house) => house._id === houseToAssign
+        );
+        if (assignedHouse) {
+          await updateHouseItem({
+            id: houseToAssign,
+            noOfStudents: assignedHouse.noOfStudents + 1,
+          }).unwrap();
+        }
+      }
 
       setSnackbarMessage("Student information updated successfully");
       setSnackbarSeverity("success");

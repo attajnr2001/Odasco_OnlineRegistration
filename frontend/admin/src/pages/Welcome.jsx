@@ -1,27 +1,43 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
 import React from "react";
-import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
+import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
+import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 
 const Welcome = () => {
+  const { data: schoolItems, isLoading: isLoadingSchool } =
+    useGetSchoolItemsQuery();
+
+  const school = schoolItems?.[0];
+
   return (
     <Box
       sx={{
         height: "85vh",
+        display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         textAlign: "center",
         padding: 3,
       }}
     >
+      <Avatar
+        src={`${school.logo}`}
+        sx={{
+          width: "100px",
+          height: "100px",
+          marginBottom: 2,
+        }}
+      />
       <Typography
         variant="h4"
         gutterBottom
         sx={{ textTransform: "uppercase", fontWeight: "bold", color: "#333" }}
       >
-        Welcome to the SHS Online Admission Portal
+        {`Welcome to the ${school.name} Online Admission Portal`}
       </Typography>
-      <Typography variant="body1" sx={{ margin: "0 auto" }}>
+      <Typography variant="body1" sx={{ margin: "0 auto", maxWidth: "90%" }}>
         We are delighted to have you on board for the Senior High School online
         admission process. Our platform is designed to provide you with a
         seamless and efficient experience as you navigate through the

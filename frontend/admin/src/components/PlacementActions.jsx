@@ -31,9 +31,10 @@ import { visuallyHidden } from "@mui/utils";
 import { useLocationIP, getPlatform } from "../helpers/utils";
 import {
   useGetStudentItemsQuery,
-  useAddStudentItemMutation,
   useUpdateStudentItemMutation,
+  useDeleteUnregisteredStudentsMutation,
   useDeleteStudentItemMutation,
+  useGetRecentStudentsQuery,
 } from "../slices/studentApiSlice";
 import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 
@@ -57,7 +58,10 @@ const PlacementActions = () => {
     isError,
     error,
   } = useGetStudentItemsQuery();
-  const [deleteStudentItem] = useDeleteStudentItemMutation();
+  const { data: recentStudents, isLoading: isLoadingRecent } =
+    useGetRecentStudentsQuery();
+  const [deleteUnregisteredStudents, { isLoading: isDeleting }] =
+    useDeleteUnregisteredStudentsMutation();
 
   const { data: programs, isLoading: programsLoading } =
     useGetProgramItemsQuery();
@@ -93,10 +97,14 @@ const PlacementActions = () => {
 
   const handlePDFExport = async () => {
     try {
-      const currentUser = true;
+      if (!recentStudents || recentStudents.length === 0) {
+        setSnackbarMessage("No recent students to export");
+        setSnackbarOpen(true);
+        return;
+      }
 
       const doc = new jsPDF();
-      doc.text("Students List", 20, 10);
+      doc.text("Recently Imported Students List", 20, 10);
       doc.autoTable({
         head: [
           [
@@ -109,9 +117,10 @@ const PlacementActions = () => {
             "Status",
           ],
         ],
-        body: filteredStudents.map((student) => [
+        body: recentStudents.map((student) => [
           student.indexNumber,
           `${student.otherNames} ${student.surname}`,
+          student.jhsAttended,
           student.aggregate,
           getProgramName(student.program),
           student.year,
@@ -119,17 +128,11 @@ const PlacementActions = () => {
         ]),
       });
 
-      doc.save("students.pdf");
-      // Fetch current datetime from World Time API
-      const response = await fetch(
-        "http://worldtimeapi.org/api/timezone/Africa/Accra"
-      );
-      const data = await response.json();
-      const dateTimeString = data.datetime;
-
-      // Log the addition of a new house
+      doc.save("recent_students.pdf");
     } catch (error) {
       console.log("Error downloading list", error);
+      setSnackbarMessage("Error downloading list");
+      setSnackbarOpen(true);
     }
   };
 
@@ -184,34 +187,19 @@ const PlacementActions = () => {
     setOpenDialog(false);
     if (confirm) {
       try {
-        const currentUser = true;
-
-        // Fetch current datetime from World Time API
-        const response = await fetch(
-          "http://worldtimeapi.org/api/timezone/Africa/Accra"
-        );
-        const data = await response.json();
-        const dateTimeString = data.datetime;
-        const dateTimeParts = dateTimeString.split(/[+\-]/);
-        const dateTime = new Date(`${dateTimeParts[0]} UTC${dateTimeParts[1]}`);
-        // Subtract one hour from the datetime
-        dateTime.setHours(dateTime.getHours() - 1);
-
-        // Log the addition of a new house
-
+        const result = await deleteUnregisteredStudents().unwrap();
         console.log("Unregistered students deleted successfully!");
-        // Show success snackbar
-        setSnackbarMessage("Unregistered students deleted successfully!");
+        setSnackbarMessage(result.message);
         setSnackbarOpen(true);
         setAlertSeverity("success");
       } catch (error) {
         console.error("Error deleting unregistered students:", error);
-        // Show error snackbar
         setSnackbarMessage(
-          "Error deleting unregistered students: " + error.message
+          "Error deleting unregistered students: " +
+            (error.data?.message || error.error)
         );
         setSnackbarOpen(true);
-        setAlertSeverity("error"); // Should be "error" instead of "success"
+        setAlertSeverity("error");
       }
     }
   };
@@ -257,8 +245,9 @@ const PlacementActions = () => {
             variant="outlined"
             color="secondary"
             onClick={handlePDFExport}
+            disabled={isLoadingRecent}
           >
-            Download Previously Imported List
+            {isLoadingRecent ? "Loading..." : "Download Recently Imported List"}
           </Button>
         </Grid>
         <Grid item>
@@ -266,8 +255,9 @@ const PlacementActions = () => {
             variant="outlined"
             color="error"
             onClick={handleDeleteUnregisteredStudents}
+            disabled={isDeleting}
           >
-            Delete All Unregistered Placement
+            {isDeleting ? "Deleting..." : "Delete All Unregistered Placement"}
           </Button>
         </Grid>
       </Grid>
@@ -314,6 +304,9 @@ const PlacementActions = () => {
                   ) : null}
                 </TableSortLabel>
               </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                JHS Attended
+              </TableCell>
 
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 Aggregate
@@ -348,6 +341,7 @@ const PlacementActions = () => {
               <TableRow key={index}>
                 <TableCell align="center">{student.indexNumber}</TableCell>
                 <TableCell align="center">{`${student.otherNames} ${student.surname}`}</TableCell>
+                <TableCell align="center">{student.jhsAttended}</TableCell>
                 <TableCell align="center">{student.aggregate}</TableCell>
                 <TableCell align="center">
                   {getProgramName(student.program)}
@@ -408,8 +402,16 @@ const PlacementActions = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => handleDialogClose(false)}>Cancel</Button>
-          <Button onClick={() => handleDialogClose(true)}>Confirm</Button>
+          <Button
+            onClick={() => handleDialogClose(false)}
+            color="error"
+            autoFocus
+          >
+            Cancel
+          </Button>
+          <Button onClick={() => handleDialogClose(true)} variant="contained">
+            Confirm
+          </Button>
         </DialogActions>
       </Dialog>
       <NetworkStatusWarning />

@@ -1,43 +1,68 @@
-import React, { useEffect, useState } from "react";
-import { Button, Box } from "@mui/material";
+import React, { useMemo } from "react";
+import { Box } from "@mui/material";
 import Widget from "../components/Widget";
 import "../styles/widget.css";
 import Chart from "./Chart";
-import { useParams } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
+import { useGetStudentItemsQuery } from "../slices/studentApiSlice";
+import { useGetHouseItemsQuery } from "../slices/houseApiSlice";
 
 const HouseAllocations = () => {
-  const [houseData, setHouseData] = useState([]);
-  const [totalStudents, setTotalStudents] = useState(0);
-  const [boardingStudents, setBoardingStudents] = useState(0);
-  const [dayStudents, setDayStudents] = useState(0);
-  const { schoolID } = "schoolID";
-  const [showWidgets, setShowWidgets] = useState(false);
-  ("DAY");
-  const toggleWidgets = () => {
-    setShowWidgets(!showWidgets);
-  };
+  const {
+    data: students,
+    isLoading: studentsLoading,
+    isError: studentsError,
+  } = useGetStudentItemsQuery();
+  const {
+    data: houses,
+    isLoading: housesLoading,
+    isError: housesError,
+  } = useGetHouseItemsQuery();
 
-  useEffect(() => {
-    const fetchHouseData = () => {};
-    const fetchStudentData = () => {};
-  }, [schoolID]);
+  const widgetData = useMemo(() => {
+    if (!students) return [];
 
-  const handlePrintHouseAllocations = () => {
-    console.log("Printing house allocations...");
-  };
+    const completedStudents = students.filter((student) => student.completed);
+    const completedTotal = completedStudents.length;
+    const completedDayStudents = completedStudents.filter(
+      (student) => student.status === "Day"
+    );
+    const completedBoardingStudents = completedStudents.filter(
+      (student) => student.status === "Boarding"
+    );
+
+    return [
+      {
+        type: "completedTotal",
+        count: completedTotal,
+        total: completedTotal,
+      },
+      {
+        type: "day",
+        count: completedDayStudents.length,
+        total: completedTotal,
+      },
+      {
+        type: "boarding",
+        count: completedBoardingStudents.length,
+        total: completedTotal,
+      },
+    ];
+  }, [students]);
+
+  const houseChartData = useMemo(() => {
+    if (!houses) return [];
+    return houses.map((house) => ({
+      name: house.name,
+      noOfStudents: house.noOfStudents,
+    }));
+  }, [houses]);
+
+  if (studentsLoading || housesLoading) return <div>Loading...</div>;
+  if (studentsError || housesError) return <div>Error loading data</div>;
 
   return (
-    <div>
-      <Button
-        variant="contained"
-        color="primary"
-        size="small"
-        onClick={handlePrintHouseAllocations}
-      >
-        Print House Allocations
-      </Button>
-
+    <Box>
       <Box
         sx={{
           display: { xs: "block", md: "flex" },
@@ -47,19 +72,25 @@ const HouseAllocations = () => {
           padding: 2,
         }}
       >
-        <Widget type="total" pop={totalStudents} />
-        <Widget type="BOARDING" pop={boardingStudents} />
-        <Widget type="DAY" pop={dayStudents} />
+        {widgetData.map((data) => (
+          <Box key={data.type} sx={{ flex: 1, display: "flex" }}>
+            <Widget
+              type={data.type}
+              count={data.count}
+              total={data.total}
+              completedTotal={data.total}
+            />
+          </Box>
+        ))}
       </Box>
-      <div className="chart">
-        <Chart
-          aspect={2 / 1}
-          title={"Summary of House Allocation"}
-          data={houseData}
-        />
-      </div>
+
+      <Box sx={{ mt: 4, mb: 4 }}>
+        <h2>House Allocations</h2>
+        <Chart houseData={houseChartData} />
+      </Box>
+
       <NetworkStatusWarning />
-    </div>
+    </Box>
   );
 };
 

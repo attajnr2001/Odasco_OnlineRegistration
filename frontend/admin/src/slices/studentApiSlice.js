@@ -35,6 +35,20 @@ export const studentApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Student"],
     }),
+    getRecentStudents: builder.query({
+      query: () => ({
+        url: `${STUDENT_URL}/recent`,
+        method: "GET",
+      }),
+      providesTags: ["Student"],
+    }),
+    deleteUnregisteredStudents: builder.mutation({
+      query: () => ({
+        url: `${STUDENT_URL}/unregistered`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Student"],
+    }),
   }),
 });
 
@@ -43,4 +57,6 @@ export const {
   useAddStudentItemMutation,
   useUpdateStudentItemMutation,
   useDeleteStudentItemMutation,
+  useGetRecentStudentsQuery,
+  useDeleteUnregisteredStudentsMutation,
 } = studentApiSlice;

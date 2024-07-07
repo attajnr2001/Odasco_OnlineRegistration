@@ -2,13 +2,12 @@ import React from "react";
 import { Verified, CheckCircle, Cancel } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import "../styles/widget.css"
+import "../styles/widget.css";
 
-const Widget = React.memo(({ type, count }) => {
+const Widget = React.memo(({ type, count, total, completedTotal }) => {
   const widgetData = {
     total: {
       title: "TOTAL STUDENTS",
-      diff: 100,
       icon: (
         <Verified
           className="icon"
@@ -21,7 +20,18 @@ const Widget = React.memo(({ type, count }) => {
     },
     completed: {
       title: "COMPLETED STUDENTS",
-      diff: 20,
+      icon: (
+        <CheckCircle
+          className="icon"
+          style={{
+            backgroundColor: "rgba(218, 165, 32, 0.2)",
+            color: "goldenrod",
+          }}
+        />
+      ),
+    },
+    completedTotal: {
+      title: "COMPLETED STUDENTS",
       icon: (
         <CheckCircle
           className="icon"
@@ -34,7 +44,30 @@ const Widget = React.memo(({ type, count }) => {
     },
     incomplete: {
       title: "INCOMPLETE STUDENTS",
-      diff: 80,
+      icon: (
+        <Cancel
+          className="icon"
+          style={{
+            color: "crimson",
+            backgroundColor: "rgba(255, 0, 0, 0.2)",
+          }}
+        />
+      ),
+    },
+    day: {
+      title: "DAY STUDENTS",
+      icon: (
+        <CheckCircle
+          className="icon"
+          style={{
+            backgroundColor: "rgba(218, 165, 32, 0.2)",
+            color: "goldenrod",
+          }}
+        />
+      ),
+    },
+    boarding: {
+      title: "BOARDING STUDENTS",
       icon: (
         <Cancel
           className="icon"
@@ -48,6 +81,13 @@ const Widget = React.memo(({ type, count }) => {
   };
 
   const data = widgetData[type];
+  let diff;
+
+  if (type === "day" || type === "boarding") {
+    diff = completedTotal ? Math.round((count / completedTotal) * 100) : 0;
+  } else {
+    diff = total ? Math.round((count / total) * 100) : 100;
+  }
 
   return (
     <motion.div
@@ -59,10 +99,12 @@ const Widget = React.memo(({ type, count }) => {
       <div className="left">
         <span className="title">{data.title}</span>
         <span className="pop">{count}</span>
-        <Link to="#">{"see all"}</Link>
+        <Link to="#" style={{ textDecoration: "underline", fontSize: "small" }}>
+          {"see all"}
+        </Link>
       </div>
       <div className="right">
-        {`${data.diff}%`}
+        <span style={{ fontSize: "small" }}>{`${diff}%`}</span>
         {data.icon}
       </div>
     </motion.div>

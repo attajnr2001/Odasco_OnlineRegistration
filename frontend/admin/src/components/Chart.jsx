@@ -1,50 +1,40 @@
-import React, { useState, useEffect } from "react";
-import "../styles/chart.css";
-import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; 
-
+import React from "react";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
-import LoadingSkeleton from "./LoadingSkeleton"; // Import the Skeleton component
 
-const Chart = ({ aspect, title, data }) => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setLoading(false);
-    }
-  }, [data]);
-
-  if (loading) {
-    return <LoadingSkeleton />; // Render Skeleton while loading
-  }
-
+const Chart = ({ houseData }) => {
   return (
-    <div className="chart">
-      <div className="title">{title}</div>
-      <ResponsiveContainer width="100%" aspect={aspect}>
-        <BarChart
-          width={730}
-          height={250}
-          data={data} // Use the passed data prop here
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-        >
-          <XAxis dataKey="name" stroke="gray" interval="preserveStartEnd" />
-          <YAxis stroke="gray" />
-          <CartesianGrid strokeDasharray="3 3" className="chartGrid" />
-          <Tooltip />
-          <Bar dataKey="noOfStudent" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
-      <NetworkStatusWarning />
-    </div>
+    <ResponsiveContainer width="100%" height={400}>
+      <LineChart
+        data={houseData}
+        margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line
+          type="monotone"
+          dataKey="noOfStudents"
+          stroke="#8884d8"
+          activeDot={{ r: 8 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
   );
 };
 

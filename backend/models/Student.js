@@ -3,33 +3,23 @@ import mongoose from "mongoose";
 
 const studentSchema = mongoose.Schema(
   {
-    admissionNo: {
-      type: Number,
-    },
-    aggregate: {
+    admissionNo: {      type: Number,
+    },    aggregate: {
       type: Number,
     },
     completed: {
-      type: Boolean,
-      default: false,
+      type: Boolean,      default: false,
     },
     hasPaid: {
-      type: Boolean,
-      default: false,
+      type: Boolean,      default: false,
     },
     dateOfBirth: {
       type: String,
     },
-    otherNames: {
-      type: String,
-      required: true,
-    },
-    gender: {
-      type: String,
+    otherNames: {      type: String,      required: true,    },    gender: {                type: String,
       enum: ["Male", "Female"],
       required: true,
-    },
-    indexNumber: {
+    },    indexNumber: {
       type: String,
       required: true,
       unique: true,
@@ -46,11 +36,9 @@ const studentSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Day", "Boarding"],
-    },
+      enum: ["Day", "Boarding"],    },
     year: {
-      type: String,
-    },
+      type: String,    },
     rawScore: {
       type: String,
     },

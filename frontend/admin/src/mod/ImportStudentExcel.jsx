@@ -64,7 +64,7 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
             surname: student["Surname"] || "",
             program: student["Programme"] || "",
             smsContact: student["SMS Contact"] || "",
-            status: student["Boarding Status"] || "",
+            status: student["Boarding Status"] || "Day",
             completed: false,
             hasPaid: false,
             year: studentYear,
@@ -111,7 +111,7 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
       <DialogContent>
         <a
           href={
-            "https://firebasestorage.googleapis.com/v0/b/shsreg-bb2a1.appspot.com/o/student%20temp.xlsx?alt=media&token=378333e0-edfa-4674-a6bb-3ba0b6dd6ad2"
+            "https://firebasestorage.googleapis.com/v0/b/shsreg-bb2a1.appspot.com/o/student%20temp%20(4).xlsx?alt=media&token=9da2c73c-bf9e-4994-a4fa-a6f8ae97163f"
           }
           download
         >

@@ -19,11 +19,17 @@
 }
 
 .widget .left .title,
-.widget .left .pop,
 .widget .right .title {
   font-weight: bold;
   font-size: 14px;
   color: rgb(160, 160, 160);
+}
+
+.widget .left .pop {
+  font-weight: bold;
+  font-size: 14px;
+  color: rgb(160, 160, 160);
+  font-size: 1.5rem;
 }
 
 .widget .left .counter,
@@ -32,33 +38,10 @@
   font-weight: 300;
 }
 
-.widget .left .pop {
-  font-size: larger;
-}
 
-.widget .left .link,
-.widget .right .link {
-  width: max-content;
-  font-size: 12px;
-  border-bottom: 1px solid gray;
-}
 
-.widget .left .percentage,
-.widget .right .percentage {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-}
 
-.widget .left .percentage.positive,
-.widget .right .percentage.positive {
-  color: green;
-}
 
-.widget .left .percentage.negative,
-.widget .right .percentage.negative {
-  color: red;
-}
 
 .widget .left .icon,
 .widget .right .icon {

@@ -27,9 +27,9 @@ const Dashboard = () => {
     const incompleteStudents = totalStudents - completedStudents;
 
     return [
-      { type: "total", count: totalStudents },
-      { type: "completed", count: completedStudents },
-      { type: "incomplete", count: incompleteStudents },
+      { type: "total", count: totalStudents, total: totalStudents },
+      { type: "completed", count: completedStudents, total: totalStudents },
+      { type: "incomplete", count: incompleteStudents, total: totalStudents },
     ];
   }, [students]);
 
@@ -67,7 +67,7 @@ const Dashboard = () => {
               {widgetData.map((data) => (
                 <Box key={data.type} sx={{ flex: 1, display: "flex" }}>
                   <Suspense fallback={<div>Loading...</div>}>
-                    <Widget type={data.type} count={data.count}/>
+                    <Widget type={data.type} count={data.count} total={data.total} />
                   </Suspense>
                 </Box>
               ))}
