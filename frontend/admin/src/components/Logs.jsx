@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
+import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -17,19 +17,20 @@ import {
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { format, parseISO } from "date-fns";
-import * as XLSX from "xlsx";
-import Papa from "papaparse";
 import { useGetLogItemsQuery } from "../slices/logApiSlice";
 import { useLocationIP, getPlatform } from "../helpers/utils";
 
-
 const Logs = () => {
-  const { schoolID } = "schoolID";
   const [logs, setLogs] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [loading, setLoading] = useState(true);
   const { data: logItems, isLoading, isError, error } = useGetLogItemsQuery();
+
+  useEffect(() => {
+    if (logItems) {
+      setLogs(logItems);
+    }
+  }, [logItems]);
 
   if (isLoading) {
     return (
@@ -39,7 +40,7 @@ const Logs = () => {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="error-container">
         <Alert severity="error">{error.message}</Alert>
@@ -49,8 +50,6 @@ const Logs = () => {
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-    const startIndex = newPage * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -64,8 +63,8 @@ const Logs = () => {
     doc.autoTable({
       head: [["Username", "Date Time", "Action", "Location IP"]],
       body: logs.map((log) => [
-        log.username,
-        log.formattedDate,
+        log.user ? log.user.name : "Unknown",
+        format(parseISO(log.createdAt), "yyyy-MM-dd HH:mm:ss"),
         log.action,
         log.locationIP,
       ]),
@@ -75,7 +74,7 @@ const Logs = () => {
 
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const slicedLogs = logItems.slice(startIndex, endIndex);
+  const slicedLogs = logs.slice(startIndex, endIndex);
 
   return (
     <div>
@@ -99,9 +98,11 @@ const Logs = () => {
           </TableHead>
           <TableBody>
             {slicedLogs.map((log) => (
-              <TableRow key={log.id}>
-                <TableCell>{log.user}</TableCell>
-                <TableCell>{log.createdAt}</TableCell>
+              <TableRow key={log._id}>
+                <TableCell>{log.user ? log.user.name : "Unknown"}</TableCell>
+                <TableCell>
+                  {format(parseISO(log.createdAt), "yyyy-MM-dd HH:mm:ss")}
+                </TableCell>
                 <TableCell>{log.action}</TableCell>
                 <TableCell>{log.locationIP}</TableCell>
               </TableRow>
@@ -110,7 +111,7 @@ const Logs = () => {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10]}
+        rowsPerPageOptions={[10, 25, 50]}
         component="div"
         count={logs.length}
         rowsPerPage={rowsPerPage}

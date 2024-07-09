@@ -25,6 +25,7 @@ const AddStudentModal = ({ open, onClose }) => {
   const [program, setProgram] = useState("");
   const [aggregate, setAggregate] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [jhsAttended, setJhsAttended] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const locationIP = useLocationIP();
@@ -71,6 +72,7 @@ const AddStudentModal = ({ open, onClose }) => {
         aggregate,
         dateOfBirth: formattedDateOfBirth,
         year: studentYear,
+        jhsAttended,
       }).unwrap();
       setSnackbarMessage(
         `User added successfully. Admission Number: ${result.admissionNo}`
@@ -97,6 +99,7 @@ const AddStudentModal = ({ open, onClose }) => {
     setProgram("");
     setAggregate("");
     setDateOfBirth("");
+    setJhsAttended("");
     setStudentYear(dayjs().year()); // Reset year to current year
     onClose();
   };
@@ -204,9 +207,18 @@ const AddStudentModal = ({ open, onClose }) => {
           </TextField>
           <TextField
             required
+            label="JHS Attended"
+            name="jhsAttended"
+            fullWidth
+            margin="normal"
+            value={jhsAttended}
+            onChange={(e) => setJhsAttended(e.target.value)}
+          />
+          <TextField
+            required
             label="Aggregate of best 6"
             name="aggregate"
-            type="number"
+          type="number"
             fullWidth
             margin="normal"
             value={aggregate}

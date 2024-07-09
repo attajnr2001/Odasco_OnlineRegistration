@@ -41,6 +41,12 @@ const EditAdmissionDetails = () => {
   const [schOpeningDateTime, setSchOpeningDateTime] = useState("");
   const [announcements, setAnnouncements] = useState([]);
 
+  const checkAdmissionStatus = (dateTime) => {
+    const currentDate = new Date();
+    const admissionDate = new Date(dateTime);
+    return admissionDate < currentDate;
+  };
+
   const handleAddAnnouncement = () => {
     setAnnouncements([...announcements, ""]);
   };
@@ -109,6 +115,8 @@ const EditAdmissionDetails = () => {
     }
 
     try {
+      const newAdmissionStatus = checkAdmissionStatus(admissionOpeningDateTime);
+
       const updatedSchool = {
         senderID: admissionData.senderID,
         year: admissionData.year,
@@ -122,14 +130,19 @@ const EditAdmissionDetails = () => {
         allowUploadPictures: admissionData.allowUploadPictures,
         autoStudentHousing: admissionData.autoStudentHousing,
         allowStudentClassSelection: admissionData.allowStudentClassSelection,
-        admissionStatus: admissionData.admissionStatus,
-        announcement: announcements.filter((a) => a.trim() !== ""), // Remove empty announcements
+        admissionStatus: newAdmissionStatus,
+        announcement: announcements.filter((a) => a.trim() !== ""),
       };
 
       const result = await updateSchoolItem({
         id: schoolItems[0]._id,
         ...updatedSchool,
       }).unwrap();
+
+      setAdmissionData((prevData) => ({
+        ...prevData,
+        admissionStatus: newAdmissionStatus,
+      }));
 
       setAlertMessage("School details updated successfully!");
       setAlertSeverity("success");
@@ -141,6 +154,16 @@ const EditAdmissionDetails = () => {
       setIsUpdating(false);
       setSnackbarOpen(true);
     }
+  };
+
+  const handleAdmissionOpeningDateTimeChange = (e) => {
+    const newDateTime = e.target.value;
+    setAdmissionOpeningDateTime(newDateTime);
+    const newAdmissionStatus = checkAdmissionStatus(newDateTime);
+    setAdmissionData((prevData) => ({
+      ...prevData,
+      admissionStatus: newAdmissionStatus,
+    }));
   };
 
   const handleTextFieldChange = (field, value) => {
@@ -299,7 +322,7 @@ const EditAdmissionDetails = () => {
           type="datetime-local"
           fullWidth
           value={admissionOpeningDateTime}
-          onChange={(e) => setAdmissionOpeningDateTime(e.target.value)}
+          onChange={handleAdmissionOpeningDateTimeChange}
           margin="normal"
           InputLabelProps={{
             shrink: true,

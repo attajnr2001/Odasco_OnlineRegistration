@@ -12,12 +12,11 @@ import {
 import { Visibility, VisibilityOff, Person } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
-import { useLocationIP } from "../helpers/utils";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
 import { useDispatch, useSelector } from "react-redux";
 import { useLoginMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
-import { useCreateLogItemMutation } from "../slices/logApiSlice";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,8 +24,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [createLogItem] = useCreateLogItemMutation();
   const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -53,12 +52,7 @@ const Login = () => {
         dispatch(setCredentials({ ...res }));
 
         if (!ipLoading) {
-          const logsDetails = await createLogItem({
-            action: "User Login",
-            user: res._id,
-            locationIP: locationIP || "Unknown",
-          });
-          console.log(logsDetails);
+          await createLog("User Login", res._id, locationIP);
         } else {
           console.log("IP address not available yet");
         }

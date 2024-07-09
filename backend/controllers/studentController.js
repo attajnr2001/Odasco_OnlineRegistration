@@ -1,6 +1,7 @@
 // controllers/studentController.js
 import asyncHandler from "express-async-handler";
 import Student from "../models/Student.js";
+import Program from "../models/Program.js";
 
 // @desc    Get all student items
 // @route   GET /api/student
@@ -83,6 +84,13 @@ const createStudentItem = asyncHandler(async (req, res) => {
   });
 
   if (studentItem) {
+    // Update the program's noOfStudents
+    await Program.findByIdAndUpdate(
+      program,
+      { $inc: { noOfStudents: 1 } },
+      { new: true }
+    );
+
     res.status(201).json(studentItem);
   } else {
     res.status(400);

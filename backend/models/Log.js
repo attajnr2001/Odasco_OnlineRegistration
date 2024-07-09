@@ -5,7 +5,6 @@ const logSchema = mongoose.Schema(
     action: {
       type: String,
       required: true,
-      unique: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

@@ -1,5 +1,6 @@
 // src/helpers/utils.js
 import { useEffect, useState } from "react";
+import { useCreatePublicLogItemMutation } from "../slices/logApiSlice";
 
 export const useLocationIP = () => {
   const [locationIP, setLocationIP] = useState("");
@@ -33,4 +34,24 @@ export const getPlatform = () => {
   } else {
     return "desktop";
   }
+};
+
+export const useCreateLog = () => {
+  const [createPublicLogItem] = useCreatePublicLogItemMutation();
+
+  const createLog = async (action, userId, locationIP) => {
+    try {
+      const logDetails = await createPublicLogItem({
+        action,
+        user: userId,
+        locationIP: locationIP || "Unknown",
+      }).unwrap();
+      console.log("Log created:", logDetails);
+      return logDetails;
+    } catch (error) {
+      console.error("Error creating log:", error);
+    }
+  };
+
+  return createLog;
 };

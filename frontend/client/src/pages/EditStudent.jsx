@@ -127,9 +127,18 @@ const EditStudent = () => {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      setFile(selectedFile);
-      const objectURL = URL.createObjectURL(selectedFile);
-      setPreviewURL(objectURL);
+      if (selectedFile.size > 1.5 * 1024 * 1024) {
+        setSnackbarMessage(
+          "File size exceeds 1.5MB. Please choose a smaller image."
+        );
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+        e.target.value = "";
+      } else {
+        setFile(selectedFile);
+        const objectURL = URL.createObjectURL(selectedFile);
+        setPreviewURL(objectURL);
+      }
     }
   };
 
@@ -217,7 +226,7 @@ const EditStudent = () => {
       };
 
       const result = await updateStudentItem(updatedStudentData).unwrap();
-      
+
       if (houseToAssign) {
         const assignedHouse = houses.find(
           (house) => house._id === houseToAssign
@@ -402,7 +411,7 @@ const EditStudent = () => {
           variant="outlined"
           fullWidth
           margin="normal"
-          value={student.jhsAttended}
+          value={student.jhsAttended ? student.jhsAttended : jhsAttended}
           onChange={(e) => setJhsAttended(e.target.value)}
           InputLabelProps={{
             shrink: true,

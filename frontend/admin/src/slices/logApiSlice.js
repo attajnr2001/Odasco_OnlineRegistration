@@ -20,7 +20,18 @@ export const logApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Log"],
     }),
+    createPublicLogItem: builder.mutation({
+      query: (data) => ({
+        url: `${LOG_URL}/public`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useGetLogItemsQuery, useCreateLogItemMutation } = logApiSlice;
+export const {
+  useCreatePublicLogItemMutation,
+  useGetLogItemsQuery,
+  useCreateLogItemMutation,
+} = logApiSlice;

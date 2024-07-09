@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -20,13 +20,13 @@ import { logout } from "../slices/authSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "../slices/usersApiSlice";
 import viteLogo from "/logo.jpg";
-import ChangePassword from "../mod/ChangePassword";
-import { useParams } from "react-router-dom";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import "../styles/navbar.css";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditProfile from "../mod/EditProfile";
+import { useCreateLogItemMutation } from "../slices/logApiSlice";
 
 const HideOnScroll = (props) => {
   const { children } = props;
@@ -41,6 +41,8 @@ const HideOnScroll = (props) => {
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const createLog = useCreateLog();
+  const { locationIP, loading: ipLoading } = useLocationIP();
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [utilitiesOpen, setUtilitiesOpen] = useState(false);
   const [placementOpen, setPlacementOpen] = useState(false);
@@ -53,6 +55,7 @@ const Navbar = () => {
   const [admissionYear, setAdmissionYear] = useState(null);
   const { userInfo } = useSelector((state) => state.auth);
   const [openProfile, setOpenProfile] = useState(false);
+  const [createLogItem] = useCreateLogItemMutation();
 
   const dispatch = useDispatch();
   const [logoutApiCall] = useLogoutMutation();
@@ -69,41 +72,23 @@ const Navbar = () => {
     resetMenuState();
   }, []);
 
-  const getPlatform = () => {
-    const userAgent = navigator.userAgent;
-    if (/Mobi|Android/i.test(userAgent)) {
-      return "mobile";
-    } else if (/Tablet|iPad/i.test(userAgent)) {
-      return "tablet";
-    } else {
-      return "desktop";
-    }
-  };
-
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
       await logoutApiCall().unwrap();
-      dispatch(logout());
-      navigate("/login");
 
-      let locationIP = "unknown";
-      try {
-        const response = await fetch("https://api64.ipify.org?format=json");
-        const data = await response.json();
-        locationIP = data.ip;
-      } catch (fetchError) {
-        console.error("Failed to fetch location IP:", fetchError);
+      if (!ipLoading && userInfo) {
+        await createLog("User Logout", userInfo._id, locationIP);
+      } else {
+        console.log("IP address not available yet or user info is missing");
       }
 
-      const response = await fetch(
-        "http://worldtimeapi.org/api/timezone/Africa/Accra"
-      );
-      const data = await response.json();
+      dispatch(logout());
+      navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      setIsLoggingOut(false); // Set the loading state to false after the logout process is complete
+      setIsLoggingOut(false);
     }
   };
 
@@ -273,11 +258,11 @@ const Navbar = () => {
                               <ListItemText primary="Manage Students" />
                             </NavLink>
                           </ListItemButton>
-                          <ListItemButton sx={{ pl: 4 }} dense>
+                          {/* <ListItemButton sx={{ pl: 4 }} dense>
                             <NavLink to={`dashboard/house-allocations`}>
                               <ListItemText primary="House Allocations" />
                             </NavLink>
-                          </ListItemButton>
+                          </ListItemButton> */}
                         </List>
                       </Collapse>
                       <ListItemButton onClick={handleActionsClick}>

@@ -35,6 +35,7 @@ import {
   useUpdateHouseItemMutation,
   useDeleteHouseItemMutation,
 } from "../slices/houseApiSlice";
+import HouseAllocations from "./HouseAllocations";
 
 const Houses = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -156,6 +157,7 @@ const Houses = () => {
 
   return (
     <div>
+      <HouseAllocations />
       <div className="house-buttons-container" style={{ marginBottom: "1rem" }}>
         <Button
           variant="contained"

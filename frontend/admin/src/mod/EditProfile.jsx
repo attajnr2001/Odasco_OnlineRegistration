@@ -13,6 +13,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useUpdateUserProfileMutation } from "../slices/usersApiSlice";
 import { setCredentials } from "../slices/authSlice";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 
 const EditProfile = ({ open, onClose, user }) => {
   const [name, setName] = useState(user?.name || "");
@@ -21,12 +22,14 @@ const EditProfile = ({ open, onClose, user }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
+  const createLog = useCreateLog();
+  const { locationIP, loading: ipLoading } = useLocationIP();
 
   const dispatch = useDispatch();
   const [updateProfile, { isLoading }] = useUpdateUserProfileMutation();
 
   const handleSubmit = async (e) => {
-    console.log(name, email, password, phone)
+    console.log(name, email, password, phone);
     e.preventDefault();
     if (password !== confirmPassword) {
       setMessage("Passwords do not match");
@@ -41,6 +44,13 @@ const EditProfile = ({ open, onClose, user }) => {
         password,
       }).unwrap();
       dispatch(setCredentials({ ...res }));
+
+      if (!ipLoading) {
+        await createLog("User Profile updated", res._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
+
       setMessage("Profile updated successfully");
       onClose();
     } catch (err) {
@@ -51,7 +61,7 @@ const EditProfile = ({ open, onClose, user }) => {
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-        <DialogTitle color={"secondary"} sx={{ fontWeight: "bold" }}>
+        <DialogTitle color={"primary"} sx={{ fontWeight: "bold" }}>
           PROFILE
         </DialogTitle>
         <form onSubmit={handleSubmit}>

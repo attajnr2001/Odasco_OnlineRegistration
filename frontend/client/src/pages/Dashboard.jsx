@@ -333,9 +333,11 @@ const Dashboard = () => {
             Announcements:
           </h5>
           <ol style={{ margin: "1em 0" }}>
-            {schoolData.announcement.map((announcement, index) => (
-              <li key={index}>{announcement}</li>
-            ))}
+            {schoolData
+              ? schoolData.announcement.map((announcement, index) => (
+                  <li key={index}>{announcement}</li>
+                ))
+              : ""}
           </ol>
         </div>
       </Grid>
