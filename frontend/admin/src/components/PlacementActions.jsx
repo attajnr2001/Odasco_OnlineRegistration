@@ -280,6 +280,7 @@ const PlacementActions = () => {
       </Grid>
       <TableContainer
         component={Paper}
+        id="table"
         sx={{ marginTop: "1em", whiteSpace: "nowrap" }}
       >
         <Table>

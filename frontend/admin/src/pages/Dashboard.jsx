@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { motion, AnimatePresence } from "framer-motion";
-import { useGetStudentItemsQuery } from "../slices/studentApiSlice"; 
+import { useGetStudentItemsQuery } from "../slices/studentApiSlice";
 
 const Widget = lazy(() => import("../components/Widget"));
 
@@ -67,7 +67,11 @@ const Dashboard = () => {
               {widgetData.map((data) => (
                 <Box key={data.type} sx={{ flex: 1, display: "flex" }}>
                   <Suspense fallback={<div>Loading...</div>}>
-                    <Widget type={data.type} count={data.count} total={data.total} />
+                    <Widget
+                      type={data.type}
+                      count={data.count}
+                      total={data.total}
+                    />
                   </Suspense>
                 </Box>
               ))}

@@ -38,11 +38,6 @@
   font-weight: 300;
 }
 
-
-
-
-
-
 .widget .left .icon,
 .widget .right .icon {
   font-size: 18px;
@@ -55,4 +50,20 @@
   .widget {
     width: 90%;
   }
+}
+
+.gender-counts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+  margin-top: 5px;
+}
+
+.gender-counts span {
+  display: flex;
+  align-items: center;
+}
+
+.gender-counts svg {
+  margin-right: 2px;
 }

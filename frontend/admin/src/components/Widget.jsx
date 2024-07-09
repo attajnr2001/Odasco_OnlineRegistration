@@ -8,6 +8,7 @@ const Widget = React.memo(({ type, count, total, completedTotal }) => {
   const widgetData = {
     total: {
       title: "TOTAL STUDENTS",
+      link: "/admin/dashboard/placement-actions",
       icon: (
         <Verified
           className="icon"
@@ -20,6 +21,7 @@ const Widget = React.memo(({ type, count, total, completedTotal }) => {
     },
     completed: {
       title: "COMPLETED STUDENTS",
+      link: "/admin/dashboard/manage-student",
       icon: (
         <CheckCircle
           className="icon"
@@ -99,7 +101,10 @@ const Widget = React.memo(({ type, count, total, completedTotal }) => {
       <div className="left">
         <span className="title">{data.title}</span>
         <span className="pop">{count}</span>
-        <Link to="#" style={{ textDecoration: "underline", fontSize: "small" }}>
+        <Link
+          to={data.link}
+          style={{ textDecoration: "underline", fontSize: "small" }}
+        >
           {"see all"}
         </Link>
       </div>
