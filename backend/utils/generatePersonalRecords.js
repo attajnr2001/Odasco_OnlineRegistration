@@ -263,6 +263,138 @@ const generatePersonalRecords = asyncHandler(async (req, res) => {
     doc.text(`${student.district}`, 117, currentY);
     currentY += 10;
 
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Region: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.enrollmentCode}`, 25, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Interest: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.interest}`, 117, currentY);
+    currentY += 10;
+
+    doc.addPage();
+    doc.addImage(schoolImageBase64, "JPEG", 10, 10, 10, 10);
+
+    currentY = 14; // Start from y = 14
+    doc.setFontSize(10);
+    doc.setFont("", "bold"); // Set font to bold
+    doc.text(`${school.name}`, 23, currentY);
+    doc.setFont("", "normal");
+    currentY += 5; // Increment currentY by 5 for the next line
+
+    doc.text(`Post Office Box ${school.box} ${school.address}`, 23, currentY);
+    currentY += 2;
+    doc.setDrawColor(0); // Set the line color to black (0 is black, 255 is white)
+    doc.line(10, currentY, 200, currentY); // Draw a line at the current y-coordinate
+    currentY += 10; // Increment currentY by 5 for the next line
+
+    doc.setFont("", "bold");
+    doc.setFontSize(12);
+    doc.text(`PERSONAL DATA`, 80, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Mobile Phone (SMS): ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.smsContact}`, 48, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Other Phone: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.otherPhone}`, 125, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Email: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.email}`, 23, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${""}`, 140, currentY);
+    currentY += 15;
+
+    doc.setFont("", "bold");
+    doc.setFontSize(12);
+    doc.text(`PARENTAL DATA`, 80, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Father's Name: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.fathersName}`, 37, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Father's Occupation", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.fathersOccupation}`, 136, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Mother's Name: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.mothersName}`, 38, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Mother's Occupation", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.mothersOccupation}`, 138, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Name of Guardian: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.guardian}`, 44, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Residential Telephone", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.residentialTelephone}`, 140, currentY);
+    currentY += 10;
+
+    doc.setFont("", "bold");
+    doc.setFontSize(12);
+    doc.text(`CERTIFY`, 10, currentY);
+    currentY += 10;
+
+    doc.setFont("", "normal");
+    doc.setFontSize(12);
+    doc.text(
+      `I HEREBY CERTIFY that the information provided in this form is complete, true and correct to the 
+best of my knowledge
+
+____________________________________ 
+Signature of Student
+
+____________________________________ 
+Date
+`,
+      10,
+      currentY
+    );
+    currentY += 10;
+
     // end pdf stream
     const pdfBuffer = doc.output("arraybuffer");
 
