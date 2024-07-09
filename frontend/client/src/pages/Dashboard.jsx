@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Typography, Button, Grid, Paper } from "@mui/material";
+import { Avatar, Typography, Button, Grid, Paper, Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Link } from "react-router-dom";
-import jsPDF from "jspdf";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import DescriptionIcon from "@mui/icons-material/Description";
 import TaskIcon from "@mui/icons-material/Task";
@@ -15,7 +14,6 @@ import { useGetStudentDetailsMutation } from "../slices/clientApiSlice";
 import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 import { useGetHouseItemsQuery } from "../slices/houseApiSlice";
 import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -44,7 +42,6 @@ const Dashboard = () => {
   const [getStudentDetails] = useGetStudentDetailsMutation();
   const { data: programs, isLoading: programsLoading } =
     useGetProgramItemsQuery();
-  const storage = getStorage();
 
   const { data: houses, isLoading: housesLoading } = useGetHouseItemsQuery();
   const { data: schoolItems, isLoading: schoolLoading } =
@@ -352,7 +349,7 @@ const Dashboard = () => {
           </LeftAlignedItem>
         </Grid>
 
-        <div>
+        <Box sx={{ ml: 5 }}>
           <h5
             style={{
               margin: "1rem 0",
@@ -367,7 +364,7 @@ const Dashboard = () => {
                 ))
               : ""}
           </ol>
-        </div>
+        </Box>
       </Grid>
       <NetworkStatusWarning />
     </>

@@ -59,7 +59,7 @@ const updatePaymentStatus = asyncHandler(async (req, res) => {
 const getStudentDetails = asyncHandler(async (req, res) => {
   console.log("getStudentDetails called with id:", req.params.id);
   const student = await Student.findById(req.params.id).select(
-    "admissionNo  aggregate  completed  hasPaid dateOfBirth otherNames gender indexNumber jhsAttended surname    smsContact status year rawScore enrollmentCode enrollmentForm jhsType photo placeOfBirth nationality religion religiousDenomination permanentAddress region district interest ghanaCardNumber nHISNumber mobilePhone whatsappNumber email fathersName fathersOccupation mothersName mothersOccupation guardian residentialTelephone digitalAddress house program"
+    "town admissionNo  aggregate  completed  hasPaid dateOfBirth otherNames gender indexNumber jhsAttended surname    smsContact status year rawScore enrollmentCode enrollmentForm jhsType photo placeOfBirth nationality religion religiousDenomination permanentAddress region district interest ghanaCardNumber nHISNumber mobilePhone whatsappNumber email fathersName fathersOccupation mothersName mothersOccupation guardian residentialTelephone digitalAddress house program"
   );
   if (student) {
     res.json(student);

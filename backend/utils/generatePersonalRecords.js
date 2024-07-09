@@ -161,6 +161,108 @@ const generatePersonalRecords = asyncHandler(async (req, res) => {
     doc.text(`${student.rawScore}`, 120, currentY);
     currentY += 10;
 
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Aggregate of Best 6: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.aggregate}`, 47, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("JHS Attended: ", 100, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "bold");
+    doc.text(`${student.jhsAttended}`, 127, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Enrollment Code: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.enrollmentCode}`, 42, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("House: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${await getHouseName(student.house)}`, 113, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("JHS Type: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.jhsType.toUpperCase()}`, 30, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Class: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${""}`, 30, currentY);
+    currentY += 15;
+
+    doc.setFontSize(12);
+    doc.text(`CONTACT DATA`, 80, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Gender: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.gender.toUpperCase()}`, 25, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Date of Birth: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.dateOfBirth.toLocaleDateString()}`, 125, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Nationality: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.nationality}`, 30, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Address: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.permanentAddress}`, 117, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Place of Birth: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.placeOfBirth}`, 35, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Religion: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.religion}`, 117, currentY);
+    currentY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("Town: ", 10, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.town}`, 23, currentY);
+    doc.setFontSize(12);
+    doc.setFont("", "normal");
+    doc.text("District: ", 100, currentY);
+    doc.setFontSize(13);
+    doc.setFont("", "bold");
+    doc.text(`${student.district}`, 117, currentY);
+    currentY += 10;
+
     // end pdf stream
     const pdfBuffer = doc.output("arraybuffer");
 

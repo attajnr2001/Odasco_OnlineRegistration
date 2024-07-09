@@ -90,6 +90,12 @@ const EditStudent = () => {
     return program ? program.name : "Unknown Program";
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // This will give you 'yyyy-MM-dd'
+  };
+
   const getHouseName = (houseId) => {
     if (!houses) return "Loading...";
     const house = houses.find((h) => h._id === houseId);
@@ -107,8 +113,8 @@ const EditStudent = () => {
           setPhoto(res.photo);
           setPlaceOfBirth(res.placeOfBirth);
           setDigitalAddress(res.digitalAddress);
-          setDateOfBirth(res.dateOfBirth);
-          setDistrict(re.district);
+          setDateOfBirth(formatDate(res.dateOfBirth));
+          setDistrict(res.district);
           setEmail(res.email);
           setEnrollmentForm(res.enrollmentForm);
           setFathersName(res.fathersName);
@@ -118,9 +124,19 @@ const EditStudent = () => {
           setInterest(res.interest);
           setJhsAttended(res.jhsAttended);
           setJhsType(res.jhsType);
-          setMobilePhone(res.setMobilePhone);
+          setMobilePhone(res.mobilePhone);
           setMothersName(res.mothersName);
           setMothersOccupation(res.mothersOccupation);
+          setNHISNumber(res.nHISNumber);
+          setNationality(res.nationality);
+          setPermanentAddress(res.permanentAddress);
+          setPhoto(res.photo);
+          setRegion(res.region);
+          setReligion(res.religion);
+          setReligiousDenomination(res.religiousDenomination);
+          setResidentialTelephone(res.residentialTelephone);
+          setTown(res.town);
+          setWhatsappNumber(res.whatsappNumber);
         } catch (err) {
           console.error("Failed to fetch student details:", err);
           if (err.status === 404) {
@@ -428,7 +444,7 @@ const EditStudent = () => {
           }}
         />
         <a
-          href={enrollmentForm}
+          href={student.enrollmentForm}
           download
           target="_blank"
           style={{
@@ -595,10 +611,10 @@ const EditStudent = () => {
           fullWidth
           margin="normal"
           value={town}
+          onChange={(e) => setTown(e.target.value)}
           InputLabelProps={{
             shrink: true,
           }}
-          onChange={(e) => setTown(e.target.value)}
         />
 
         <TextField

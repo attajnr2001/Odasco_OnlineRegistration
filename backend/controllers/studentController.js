@@ -125,6 +125,7 @@ const updateStudentItem = asyncHandler(async (req, res) => {
       "enrollmentForm",
       "jhsType",
       "photo",
+      "town",
       "placeOfBirth",
       "nationality",
       "religion",

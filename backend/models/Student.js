@@ -27,6 +27,9 @@ const studentSchema = mongoose.Schema(
     jhsAttended: {
       type: String,
     },
+    town: {
+      type: String,
+    },
     surname: {
       type: String,
       required: true,
