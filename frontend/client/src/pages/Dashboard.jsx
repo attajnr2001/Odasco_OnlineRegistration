@@ -79,6 +79,34 @@ const Dashboard = () => {
     }
   };
 
+  const generatePersonalRecords = async () => {
+    try {
+      const response = await fetch("/api/pdf/generate-personal-records", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ studentId: student._id }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "personal_records.pdf";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        console.error("Failed to personal records letter");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getProgramName = (programId) => {
     if (!programs) return "Loading...";
     const program = programs.find((p) => p._id === programId);
@@ -296,7 +324,7 @@ const Dashboard = () => {
           <LeftAlignedItem>
             <Button
               variant="outlined"
-              //   onClick={handleGeneratePersonalRecords}
+              onClick={generatePersonalRecords}
               color="secondary"
             >
               <DescriptionIcon />

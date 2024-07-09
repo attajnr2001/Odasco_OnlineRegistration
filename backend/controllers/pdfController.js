@@ -1,6 +1,4 @@
 // controllers/pdfController.js
 import { generateAdmissionLetter } from "../utils/generateAdmissionLetter.js";
-
-
-
-export { generateAdmissionLetter };
+import { generatePersonalRecords } from "../utils/generatePersonalRecords.js";
+export { generateAdmissionLetter, generatePersonalRecords };  

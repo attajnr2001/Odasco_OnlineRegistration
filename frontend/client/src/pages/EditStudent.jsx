@@ -102,6 +102,25 @@ const EditStudent = () => {
         try {
           const res = await getStudentDetails(clientInfo._id).unwrap();
           setStudent(res);
+          setRawScore(res.rawScore);
+          setEnrollmentCode(res.enrollmentCode);
+          setPhoto(res.photo);
+          setPlaceOfBirth(res.placeOfBirth);
+          setDigitalAddress(res.digitalAddress);
+          setDateOfBirth(res.dateOfBirth);
+          setDistrict(re.district);
+          setEmail(res.email);
+          setEnrollmentForm(res.enrollmentForm);
+          setFathersName(res.fathersName);
+          setFathersOccupation(res.fathersOccupation);
+          setGhanaCardNumber(res.ghanaCardNumber);
+          setGuardian(res.guardian);
+          setInterest(res.interest);
+          setJhsAttended(res.jhsAttended);
+          setJhsType(res.jhsType);
+          setMobilePhone(res.setMobilePhone);
+          setMothersName(res.mothersName);
+          setMothersOccupation(res.mothersOccupation);
         } catch (err) {
           console.error("Failed to fetch student details:", err);
           if (err.status === 404) {
@@ -266,7 +285,7 @@ const EditStudent = () => {
   return (
     <div className="edit-student">
       <p className="title">
-        PREVIOUS DETAILS{"  "}
+        PREVIOUS DETAILS
         <IconButton onClick={toggleWidgets} sx={{ p: 0 }}>
           {showPersonalRecords ? <VisibilityOffIcon /> : <VisibilityIcon />}
         </IconButton>
@@ -338,6 +357,9 @@ const EditStudent = () => {
                 margin="normal"
                 disabled
                 value={student.surname}
+                InputLabelProps={{
+                  shrink: true,
+                }}
               />
               <TextField
                 required
@@ -347,6 +369,9 @@ const EditStudent = () => {
                 margin="normal"
                 disabled
                 value={student.otherNames}
+                InputLabelProps={{
+                  shrink: true,
+                }}
               />
               <TextField
                 required
@@ -356,6 +381,9 @@ const EditStudent = () => {
                 margin="normal"
                 disabled
                 value={student.aggregate}
+                InputLabelProps={{
+                  shrink: true,
+                }}
               />
             </motion.div>
           )}
@@ -371,6 +399,9 @@ const EditStudent = () => {
           onChange={(e) => setRawScore(e.target.value)}
           fullWidth
           margin="normal"
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -380,6 +411,9 @@ const EditStudent = () => {
           variant="outlined"
           fullWidth
           margin="normal"
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -411,7 +445,7 @@ const EditStudent = () => {
           variant="outlined"
           fullWidth
           margin="normal"
-          value={student.jhsAttended ? student.jhsAttended : jhsAttended}
+          value={jhsAttended}
           onChange={(e) => setJhsAttended(e.target.value)}
           InputLabelProps={{
             shrink: true,
@@ -440,7 +474,7 @@ const EditStudent = () => {
         <div>
           <Avatar
             sx={{ width: "100px", height: "100px", marginBottom: "10px" }}
-            src={previewURL || student.photo || ""}
+            src={previewURL == "" ? photo : previewURL}
             alt="Student Photo"
           />
           <input
@@ -468,6 +502,9 @@ const EditStudent = () => {
           margin="normal"
           value={placeOfBirth}
           onChange={(e) => setPlaceOfBirth(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
 
         <TextField
@@ -546,6 +583,9 @@ const EditStudent = () => {
           margin="normal"
           value={permanentAddress}
           onChange={(e) => setPermanentAddress(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
 
         <TextField
@@ -555,6 +595,9 @@ const EditStudent = () => {
           fullWidth
           margin="normal"
           value={town}
+          InputLabelProps={{
+            shrink: true,
+          }}
           onChange={(e) => setTown(e.target.value)}
         />
 
@@ -618,6 +661,9 @@ const EditStudent = () => {
           margin="normal"
           value={ghanaCardNumber}
           onChange={(e) => setGhanaCardNumber(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
 
         <TextField
@@ -629,6 +675,9 @@ const EditStudent = () => {
           margin="normal"
           value={nHISNumber}
           onChange={(e) => setNHISNumber(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
 
         <p className="title">COMMUNICATIONS DETAILS</p>
@@ -640,6 +689,9 @@ const EditStudent = () => {
           margin="normal"
           value={mobilePhone}
           onChange={(e) => setMobilePhone(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -649,6 +701,9 @@ const EditStudent = () => {
           margin="normal"
           value={whatsappNumber}
           onChange={(e) => setWhatsappNumber(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -658,6 +713,9 @@ const EditStudent = () => {
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -667,6 +725,9 @@ const EditStudent = () => {
           margin="normal"
           value={fathersName}
           onChange={(e) => setFathersName(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -676,6 +737,9 @@ const EditStudent = () => {
           margin="normal"
           value={fathersOccupation}
           onChange={(e) => setFathersOccupation(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -685,6 +749,9 @@ const EditStudent = () => {
           margin="normal"
           value={mothersName}
           onChange={(e) => setMothersName(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -694,6 +761,9 @@ const EditStudent = () => {
           margin="normal"
           value={mothersOccupation}
           onChange={(e) => setMothersOccupation(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -703,6 +773,9 @@ const EditStudent = () => {
           margin="normal"
           value={guardian}
           onChange={(e) => setGuardian(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -713,6 +786,9 @@ const EditStudent = () => {
           margin="normal"
           value={residentialTelephone}
           onChange={(e) => setResidentialTelephone(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
         <TextField
           required
@@ -722,6 +798,9 @@ const EditStudent = () => {
           margin="normal"
           value={digitalAddress}
           onChange={(e) => setDigitalAddress(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+          }}
         />
 
         <Button
