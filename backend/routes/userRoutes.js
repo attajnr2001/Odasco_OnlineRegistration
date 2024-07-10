@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/auth", authUser);
 router.post("/", registerUser);
 router.post("/logout", logoutUser);
-router.get("/", protect, getUsers);
+router.get("/", getUsers);
 router.put("/:id/toggle-status", protect, toggleUserStatus);
 router.put("/profile", protect, updateUserProfile);
 

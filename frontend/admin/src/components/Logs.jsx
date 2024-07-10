@@ -30,6 +30,7 @@ const Logs = () => {
     if (logItems) {
       setLogs(logItems);
     }
+    console.log(logItems)
   }, [logItems]);
 
   if (isLoading) {

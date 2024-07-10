@@ -107,7 +107,7 @@ const Houses = () => {
     const doc = new jsPDF();
     doc.text("House Table", 20, 10);
     doc.autoTable({
-      head: [["Houses", "Gender", "Bed Capacity", "Number", "Priority"]],
+      head: [["Houses", "Gender", "Bed Capacity", "Number"]],
       body: houseItems.map((house) => [
         house.name,
         house.gender,
