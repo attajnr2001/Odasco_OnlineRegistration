@@ -6,7 +6,7 @@ import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useUpdateSchoolItemMutation } from "../slices/schoolApiSlice";
 
 const EditStudentDetails = () => {
-  const { schoolID } = "schoolID";
+
   const [studentData, setStudentData] = useState({
     showMedicalUndertaking: false,
     showProgramSubject: false,
