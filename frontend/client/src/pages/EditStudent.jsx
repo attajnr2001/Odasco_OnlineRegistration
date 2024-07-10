@@ -213,8 +213,9 @@ const EditStudent = () => {
         enrollmentFormURL = await getDownloadURL(formRef);
       }
 
-      let houseToAssign = selectedHouse;
+      let houseToAssign = selectedHouse || student.house;
 
+      // Only assign a random house if the student doesn't have one
       if (!houseToAssign) {
         const matchingHouses = houses.filter(
           (house) => house.gender === student.gender
@@ -262,7 +263,8 @@ const EditStudent = () => {
 
       const result = await updateStudentItem(updatedStudentData).unwrap();
 
-      if (houseToAssign) {
+      // Only update house if a new one was assigned
+      if (houseToAssign && houseToAssign !== student.house) {
         const assignedHouse = houses.find(
           (house) => house._id === houseToAssign
         );
