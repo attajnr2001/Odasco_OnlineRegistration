@@ -12,7 +12,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera } from "@mui/icons-material";
-import { useParams } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import {
   districts,
@@ -22,7 +21,7 @@ import {
 } from "../helpers/constants";
 import "../styles/editStudent.css";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useGetStudentDetailsMutation } from "../slices/clientApiSlice";
 import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 import { useGetHouseItemsQuery } from "../slices/houseApiSlice";
