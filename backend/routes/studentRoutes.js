@@ -7,6 +7,8 @@ import {
   deleteStudentItem,
   getRecentStudents,
   deleteUnregisteredStudents,
+  upload,
+  uploadFile,
 } from "../controllers/studentController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
@@ -16,6 +18,8 @@ const router = express.Router();
 router.route("/").get(getStudentItems).post(protect, createStudentItem);
 router.get("/recent", getRecentStudents);
 router.delete("/unregistered", protect, deleteUnregisteredStudents);
+router.post("/upload", upload.single("file"), uploadFile);
+
 
 router
   .route("/:id")

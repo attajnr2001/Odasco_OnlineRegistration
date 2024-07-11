@@ -2,6 +2,9 @@
 import asyncHandler from "express-async-handler";
 import Student from "../models/Student.js";
 import Program from "../models/Program.js";
+import multer from "multer";
+import path from "path";
+import fs from 'fs';
 
 // @desc    Get all student items
 // @route   GET /api/student
@@ -208,6 +211,50 @@ const deleteUnregisteredStudents = asyncHandler(async (req, res) => {
   }
 });
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); 
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
+const uploadFile = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  const { indexNumber } = req.body;
+
+  if (!indexNumber) {
+    return res.status(400).send("Student index number is required.");
+  }
+
+  const student = await Student.findOne({ indexNumber });
+
+  if (!student) {
+    return res.status(404).send("Student not found.");
+  }
+
+  const studentFolder = path.join("uploads", indexNumber, "photo");
+
+  if (!fs.existsSync(studentFolder)) {
+    fs.mkdirSync(studentFolder, { recursive: true });
+  }
+
+  const oldPath = req.file.path;
+  const newPath = path.join(studentFolder, req.file.filename);
+  fs.renameSync(oldPath, newPath);
+
+  student.photoPath = newPath;
+  await student.save();
+
+  res.send("File uploaded successfully");
+});
+
 export {
   getStudentItems,
   createStudentItem,
@@ -215,4 +262,6 @@ export {
   deleteStudentItem,
   getRecentStudents,
   deleteUnregisteredStudents,
+  upload,
+  uploadFile,
 };

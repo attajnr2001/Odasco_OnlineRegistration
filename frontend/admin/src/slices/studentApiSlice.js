@@ -49,6 +49,20 @@ export const studentApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Student"],
     }),
+
+    uploadStudentPhoto: builder.mutation({
+      query: ({ indexNumber, file }) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("indexNumber", indexNumber);
+        return {
+          url: `${STUDENT_URL}/upload`,
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Student"],
+    }),
   }),
 });
 
@@ -59,4 +73,5 @@ export const {
   useDeleteStudentItemMutation,
   useGetRecentStudentsQuery,
   useDeleteUnregisteredStudentsMutation,
+  useUploadStudentPhotoMutation,
 } = studentApiSlice;

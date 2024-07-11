@@ -122,6 +122,9 @@ const studentSchema = mongoose.Schema(
     digitalAddress: {
       type: String,
     },
+    photoPath: {
+      type: String,
+    },
     house: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "House",

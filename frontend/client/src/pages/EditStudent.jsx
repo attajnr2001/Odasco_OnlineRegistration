@@ -26,6 +26,7 @@ import { useGetStudentDetailsMutation } from "../slices/clientApiSlice";
 import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 import { useGetHouseItemsQuery } from "../slices/houseApiSlice";
 import { useUpdateStudentItemMutation } from "../slices/studentApiSlice";
+import { useUploadStudentPhotoMutation } from "../slices/studentApiSlice";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useUpdateHouseItemMutation } from "../slices/houseApiSlice";
 import { storage } from "../helpers/firebase";
@@ -82,6 +83,7 @@ const EditStudent = () => {
 
   const { data: houses, isLoading: housesLoading } = useGetHouseItemsQuery();
   const [updateHouseItem] = useUpdateHouseItemMutation();
+  const [uploadStudentPhoto] = useUploadStudentPhotoMutation();
 
   const getProgramName = (programId) => {
     if (!programs) return "Loading...";
@@ -158,25 +160,28 @@ const EditStudent = () => {
 
   // uploading student profile picture in firestore
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      if (selectedFile.size > 1.5 * 1024 * 1024) {
-        setSnackbarMessage(
-          "File size exceeds 1.5MB. Please choose a smaller image."
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
-        e.target.value = "";
-      } else {
-        setFile(selectedFile);
-        const objectURL = URL.createObjectURL(selectedFile);
-        setPreviewURL(objectURL);
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setPreviewURL(URL.createObjectURL(file));
+      try {
+        await uploadStudentPhoto({
+          indexNumber: student.indexNumber,
+          file,
+        }).unwrap();
+        // The API slice will automatically invalidate the Student tag,
+        // which should trigger a re-fetch of the student data including the new photo path
+      } catch (err) {
+        console.error("Failed to upload photo", err);
       }
     }
   };
 
-  const handleFileUpload = async (event) => { 
+  const photoUrl = student.photoPath
+    ? `${process.env.REACT_APP_BASE_URL}/${student.photoPath}`
+    : "";
+
+  const handleFileUpload = async (event, indexNumber) => {
     console.log("File upload triggered", event.target);
 
     if (!event.target.files || event.target.files.length === 0) {
@@ -189,16 +194,16 @@ const EditStudent = () => {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("indexNumber", indexNumber);
 
     try {
-      const response = await fetch("/api/upload", {
+      const response = await fetch("/api/students/upload", {
         method: "POST",
         body: formData,
       });
       if (response.ok) {
         const result = await response.text();
         console.log("File uploaded successfully:", result);
-        // Handle successful upload (e.g., update UI, fetch updated student data)
       } else {
         const errorText = await response.text();
         console.error("File upload failed:", errorText);
@@ -531,7 +536,7 @@ const EditStudent = () => {
             id="icon-button-file"
             type="file"
             style={{ display: "none" }}
-            onChange={handleFileUpload}
+            onChange={(e) => handleFileUpload(e, student.indexNumber)}
           />
           <label htmlFor="icon-button-file">
             <IconButton
