@@ -176,6 +176,38 @@ const EditStudent = () => {
     }
   };
 
+  const handleFileUpload = async (event) => { 
+    console.log("File upload triggered", event.target);
+
+    if (!event.target.files || event.target.files.length === 0) {
+      console.error("No file selected");
+      return;
+    }
+
+    const file = event.target.files[0];
+    console.log("File selected:", file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (response.ok) {
+        const result = await response.text();
+        console.log("File uploaded successfully:", result);
+        // Handle successful upload (e.g., update UI, fetch updated student data)
+      } else {
+        const errorText = await response.text();
+        console.error("File upload failed:", errorText);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (previewURL) {
@@ -499,7 +531,7 @@ const EditStudent = () => {
             id="icon-button-file"
             type="file"
             style={{ display: "none" }}
-            onChange={handleFileChange}
+            onChange={handleFileUpload}
           />
           <label htmlFor="icon-button-file">
             <IconButton
