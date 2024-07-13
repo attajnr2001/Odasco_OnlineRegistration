@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Alert, AlertTitle } from "@mui/material";
+import { Button, Input, Alert, AlertTitle, Box } from "@mui/material";
 import {
   ref,
   uploadBytesResumable,
@@ -10,7 +10,7 @@ import {
 import { useParams } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import { useLocationIP, getPlatform } from "../helpers/utils";
-import { storage } from "../helpers/firebase"; // Make sure to import your Firebase storage instance
+import { storage } from "../helpers/firebase";
 import {
   useGetSchoolItemsQuery,
   useUpdateSchoolItemMutation,
@@ -20,9 +20,9 @@ const Prospectus = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadError, setUploadError] = useState(null);
   const [prospectusURL, setProspectusURL] = useState(null);
-  const locationIP = useLocationIP();
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
   const { data: schoolItems, isLoading, error } = useGetSchoolItemsQuery();
   const [updateSchoolItem] = useUpdateSchoolItemMutation();
 
@@ -149,7 +149,7 @@ const Prospectus = () => {
   }, [schoolItems]);
 
   return (
-    <div className="file">
+    <Box sx={{ mb: 2 }} className="file">
       {isLoading ? (
         <p>Loading...</p>
       ) : error ? (
@@ -157,14 +157,24 @@ const Prospectus = () => {
       ) : (
         <>
           {prospectusURL && (
-            <a
-              href={prospectusURL}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-            >
-              Download Prospectus
-            </a>
+            <>
+              <a
+                href={prospectusURL}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+              >
+                Download Prospectus
+              </a>
+              <Button
+                variant="outlined"
+                onClick={() => setShowPreview(!showPreview)}
+                sx={{ ml: 2 }}
+                size="small"
+              >
+                {showPreview ? "Hide Preview" : "Show Preview"}
+              </Button>
+            </>
           )}
           <p className="newFile">Upload New Prospectus File</p>
           <Input
@@ -189,11 +199,23 @@ const Prospectus = () => {
               {successMessage}
             </Alert>
           )}
+
+          {showPreview && prospectusURL && (
+            <div style={{ width: "100%", height: "500px", marginTop: "20px" }}>
+              <iframe
+                src={`${prospectusURL}#view=FitH`}
+                width="100%"
+                height="100%"
+                style={{ border: "none" }}
+                title="Prospectus Preview"
+              />
+            </div>
+          )}
         </>
       )}
 
       <NetworkStatusWarning />
-    </div>
+    </Box>
   );
 };
 

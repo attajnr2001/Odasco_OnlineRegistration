@@ -78,10 +78,8 @@ const ManageStudent = () => {
 
   // Function to handle edit button click
   const handleEditButtonClick = (student) => {
-    console.log("Edit button clicked:", student);
-    setSelectedStudent(student); // Set the selected student
-    setIsEditModalOpen(true); // Open the modal
-    console.log("Modal open state:", isEditModalOpen);
+    setSelectedStudent(student);
+    setIsEditModalOpen(true);
   };
 
   const handleCSVExport = () => {
@@ -313,9 +311,9 @@ const ManageStudent = () => {
       <EditStudentModal
         open={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        // houses={houses}
-        // programs={programs}
-        // student={selectedStudent} 
+        student={selectedStudent}
+        houses={houses}
+        programs={programs}
       />
       <NetworkStatusWarning />
     </div>

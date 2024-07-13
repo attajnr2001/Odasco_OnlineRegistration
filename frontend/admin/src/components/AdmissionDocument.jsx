@@ -21,11 +21,9 @@ const AdmissionDocument = () => {
       <Tabs value={tabValue} onChange={handleChange} indicatorColor="primary">
         <Tab label="Prospectus" />
         <Tab label="Undertaking" />
-        <Tab label="P/S combination" />
       </Tabs>
       {tabValue === 0 && <Prospectus />}
       {tabValue === 1 && <Undertaking />}
-      {tabValue === 2 && <ProgramSubjectCombination />}
     </div>
   );
 };

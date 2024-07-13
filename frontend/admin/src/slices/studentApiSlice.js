@@ -21,8 +21,8 @@ export const studentApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["Student", "Program"],
     }),
     updateStudentItem: builder.mutation({
-      query: ({ id, ...data }) => ({
-        url: `${STUDENT_URL}/${id}`,
+      query: (data) => ({
+        url: `${STUDENT_URL}/${data._id}`,
         method: "PUT",
         body: data,
       }),

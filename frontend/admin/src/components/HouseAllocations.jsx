@@ -31,21 +31,31 @@ const HouseAllocations = () => {
       (student) => student.status === "Boarding"
     );
 
+    const getGenderCounts = (studentArray) => ({
+      male: studentArray.filter((student) => student.gender === "Male").length,
+      female: studentArray.filter((student) => student.gender === "Female")
+        .length,
+    });
+
     return [
       {
         type: "completedTotal",
         count: completedTotal,
         total: completedTotal,
+        genderCounts: getGenderCounts(completedStudents),
+      },
+
+      {
+        type: "boarding",
+        count: completedBoardingStudents.length,
+        total: completedTotal,
+        genderCounts: getGenderCounts(completedBoardingStudents),
       },
       {
         type: "day",
         count: completedDayStudents.length,
         total: completedTotal,
-      },
-      {
-        type: "boarding",
-        count: completedBoardingStudents.length,
-        total: completedTotal,
+        genderCounts: getGenderCounts(completedDayStudents),
       },
     ];
   }, [students]);
@@ -79,6 +89,7 @@ const HouseAllocations = () => {
               count={data.count}
               total={data.total}
               completedTotal={data.total}
+              genderCounts={data.genderCounts}
             />
           </Box>
         ))}

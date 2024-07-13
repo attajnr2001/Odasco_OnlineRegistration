@@ -9,6 +9,23 @@
   border-radius: 10px;
   height: 100px;
   margin: auto;
+  
+}
+
+.gender-breakdown {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8em;
+  margin-top: 5px;
+}
+
+.gender-breakdown span {
+  display: flex;
+  align-items: center;
+}
+
+.gender-breakdown span svg {
+  margin-right: 2px;
 }
 
 .widget .left,

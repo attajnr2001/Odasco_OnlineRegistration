@@ -11,7 +11,7 @@ import schoolRoutes from "./routes/schoolRoutes.js";
 import studentRoutes from "./routes/studentRoutes.js";
 import clientRoutes from "./routes/clientRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
-import pdfRoutes from "./routes/pdfRoutes.js";
+import pdfRoutes from "./routes/pdfRoutes.js"; 
 
 const port = process.env.PORT || 5000;
 connectDB();

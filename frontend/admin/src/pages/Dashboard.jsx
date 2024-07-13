@@ -26,10 +26,34 @@ const Dashboard = () => {
     ).length;
     const incompleteStudents = totalStudents - completedStudents;
 
+    const genderCounts = (filter = () => true) => {
+      const filtered = students.filter(filter);
+      return {
+        male: filtered.filter((student) => student.gender === "Male").length,
+        female: filtered.filter((student) => student.gender === "Female")
+          .length,
+      };
+    };
+
     return [
-      { type: "total", count: totalStudents, total: totalStudents },
-      { type: "completed", count: completedStudents, total: totalStudents },
-      { type: "incomplete", count: incompleteStudents, total: totalStudents },
+      {
+        type: "total",
+        count: totalStudents,
+        total: totalStudents,
+        genderCounts: genderCounts(),
+      },
+      {
+        type: "completed",
+        count: completedStudents,
+        total: totalStudents,
+        genderCounts: genderCounts((student) => student.completed),
+      },
+      {
+        type: "incomplete",
+        count: incompleteStudents,
+        total: totalStudents,
+        genderCounts: genderCounts((student) => !student.completed),
+      },
     ];
   }, [students]);
 
@@ -71,6 +95,7 @@ const Dashboard = () => {
                       type={data.type}
                       count={data.count}
                       total={data.total}
+                      genderCounts={data.genderCounts}
                     />
                   </Suspense>
                 </Box>

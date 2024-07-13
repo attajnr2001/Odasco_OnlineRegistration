@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Alert, AlertTitle } from "@mui/material";
+import { Button, Input, Alert, AlertTitle, Box } from "@mui/material";
 import {
   ref,
   uploadBytesResumable,
@@ -21,6 +21,7 @@ const Undertaking = () => {
   const [uploadError, setUploadError] = useState(null);
   const [undertakingURL, setUndertakingURL] = useState(null);
   const locationIP = useLocationIP();
+  const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
   const { data: schoolItems, isLoading, error } = useGetSchoolItemsQuery();
@@ -149,7 +150,7 @@ const Undertaking = () => {
   }, [schoolItems]);
 
   return (
-    <div className="file">
+    <Box sx={{mt: 2}} className="file">
       {isLoading ? (
         <p>Loading...</p>
       ) : error ? (
@@ -157,14 +158,24 @@ const Undertaking = () => {
       ) : (
         <>
           {undertakingURL && (
-            <a
-              href={undertakingURL}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-            >
-              Download Undertaking
-            </a>
+            <>
+              <a
+                href={undertakingURL}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+              >
+                Download Undertaking
+              </a>
+              <Button
+                variant="outlined"
+                onClick={() => setShowPreview(!showPreview)}
+                sx={{ ml: 2 }}
+                size="small"
+              >
+                {showPreview ? "Hide Preview" : "Show Preview"}
+              </Button>
+            </>
           )}
           <p className="newFile">Upload New Undertaking File</p>
           <Input
@@ -189,11 +200,23 @@ const Undertaking = () => {
               {successMessage}
             </Alert>
           )}
+
+          {showPreview && undertakingURL && (
+            <div style={{ width: "100%", height: "500px", marginTop: "20px" }}>
+              <iframe
+                src={`${undertakingURL}#view=FitH`}
+                width="100%"
+                height="100%"
+                style={{ border: "none" }}
+                title="Undertaking Preview"
+              />
+            </div>
+          )}
         </>
       )}
 
       <NetworkStatusWarning />
-    </div>
+    </Box>
   );
 };
 

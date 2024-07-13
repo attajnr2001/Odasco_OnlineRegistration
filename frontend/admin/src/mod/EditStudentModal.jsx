@@ -11,38 +11,30 @@ import {
   IconButton,
   Box,
   CircularProgress,
+  Alert,
   Snackbar,
 } from "@mui/material";
-import { db, storage, auth } from "../helpers/firebase";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  onSnapshot,
-  query,
-  collection,
-  addDoc,
-  where,
-} from "firebase/firestore";
-import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
-
+import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
+import { useUpdateStudentItemMutation } from "../slices/studentApiSlice";
 import { Camera } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import { useLocationIP, getPlatform } from "../helpers/utils";
 
-const EditStudentModal = ({ open, onClose }) => {
+const EditStudentModal = ({ open, onClose, student, houses, programs }) => {
   const [file, setFile] = useState("");
+  const [shouldCloseModal, setShouldCloseModal] = useState(false);
   const [formData, setFormData] = useState({
     indexNumber: "",
     house: "",
-    firstName: "",
-    lastName: "",
+    otherNames: "",
+    surname: "",
     program: "",
     year: "",
     status: "",
-    image: "",
+    photo: "",
   });
-  const [perc, setPerc] = useState("");
+  const [updateStudentItem, { isLoading: isUpdating }] =
+    useUpdateStudentItemMutation();
   const [uploading, setUploading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success"); // Add state for alert severity
@@ -53,9 +45,53 @@ const EditStudentModal = ({ open, onClose }) => {
     setAlertMessage(""); // Clear alert message
   };
 
-  const handleSave = (e) => {
+  useEffect(() => {
+    if (student) {
+      setFormData({
+        _id: student._id,
+        indexNumber: student.indexNumber || "",
+        house: student.house || "",
+        otherNames: student.otherNames || "",
+        surname: student.surname || "",
+        program: student.program || "",
+        year: student.year || "",
+        status: student.status || "",
+        photo: student.photo || "",
+      });
+    }
+  }, [student]);
+
+  const handleSave = async (e) => {
     e.preventDefault();
+    if (!student || !student._id) {
+      setAlertMessage("Invalid student ID");
+      setAlertSeverity("error");
+      return;
+    }
+    try {
+      const result = await updateStudentItem(formData).unwrap();
+      setAlertMessage("Student updated successfully");
+      setAlertSeverity("success");
+      setShouldCloseModal(true); // Set this to true instead of calling onClose()
+    } catch (err) {
+      console.error("Error updating student:", err);
+      setAlertMessage(
+        err.data?.message || "An error occurred while updating the student"
+      );
+      setAlertSeverity("error");
+    }
   };
+
+  useEffect(() => {
+    if (shouldCloseModal) {
+      const timer = setTimeout(() => {
+        onClose();
+        setShouldCloseModal(false);
+      }, 2000); // Adjust this time as needed
+
+      return () => clearTimeout(timer);
+    }
+  }, [shouldCloseModal, onClose]);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -64,7 +100,7 @@ const EditStudentModal = ({ open, onClose }) => {
         <Box>
           <Avatar
             sx={{ width: "100px", height: "100px", marginBottom: "10px" }}
-            src={formData.image || ""}
+            src={formData.photo || ""}
             alt="Student Image"
           />
 
@@ -91,7 +127,7 @@ const EditStudentModal = ({ open, onClose }) => {
           name="indexNumber"
           fullWidth
           margin="normal"
-          value={formData.indexNumber} // Populate value from state
+          value={formData.indexNumber}
           onChange={(e) =>
             setFormData({ ...formData, indexNumber: e.target.value })
           }
@@ -102,31 +138,34 @@ const EditStudentModal = ({ open, onClose }) => {
           name="house"
           fullWidth
           margin="normal"
-          value={formData.house} // Populate value from state
+          value={formData.house}
           onChange={(e) => setFormData({ ...formData, house: e.target.value })}
         >
-          <MenuItem key={"houseId"} value={"houseId"}>
-            Hello
-          </MenuItem>
+          {houses &&
+            houses.map((house) => (
+              <MenuItem key={house._id} value={house._id}>
+                {house.name}
+              </MenuItem>
+            ))}
         </TextField>
         <TextField
-          label="First Name"
-          name="firstName"
+          label="Other Names"
+          name="otherNames"
           fullWidth
           margin="normal"
-          value={formData.firstName} // Populate value from state
+          value={formData.otherNames}
           onChange={(e) =>
-            setFormData({ ...formData, firstName: e.target.value })
+            setFormData({ ...formData, otherNames: e.target.value })
           }
         />
         <TextField
-          label="Last Name"
-          name="lastName"
+          label="Surname"
+          name="surname"
           fullWidth
           margin="normal"
-          value={formData.lastName} // Populate value from state
+          value={formData.surname}
           onChange={(e) =>
-            setFormData({ ...formData, lastName: e.target.value })
+            setFormData({ ...formData, surname: e.target.value })
           }
         />
         <TextField
@@ -135,14 +174,17 @@ const EditStudentModal = ({ open, onClose }) => {
           name="program"
           fullWidth
           margin="normal"
-          value={formData.program} // Populate value from state
+          value={formData.program}
           onChange={(e) =>
             setFormData({ ...formData, program: e.target.value })
           }
         >
-          <MenuItem key={"programId"} value={"programId"}>
-            Programs
-          </MenuItem>
+          {programs &&
+            programs.map((program) => (
+              <MenuItem key={program._id} value={program._id}>
+                {program.name}
+              </MenuItem>
+            ))}
         </TextField>
         <TextField
           label="Year"
@@ -150,7 +192,7 @@ const EditStudentModal = ({ open, onClose }) => {
           type="number"
           fullWidth
           margin="normal"
-          value={formData.year} // Populate value from state
+          value={formData.year}
           onChange={(e) => setFormData({ ...formData, year: e.target.value })}
         />
         <TextField
@@ -159,11 +201,11 @@ const EditStudentModal = ({ open, onClose }) => {
           name="status"
           fullWidth
           margin="normal"
-          value={formData.status} // Populate value from state
+          value={formData.status}
           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
         >
-          <MenuItem value="boarding">Boarding</MenuItem>
-          <MenuItem value="day">Day</MenuItem>
+          <MenuItem value="Boarding">Boarding</MenuItem>
+          <MenuItem value="Day">Day</MenuItem>
         </TextField>
       </DialogContent>
       <DialogActions>
@@ -174,18 +216,24 @@ const EditStudentModal = ({ open, onClose }) => {
           color="primary"
           variant="contained"
           onClick={handleSave}
-          disabled={isSaving || uploading}
+          disabled={isUpdating}
         >
-          {isSaving || uploading ? "Saving" : "Save"}
+          {isUpdating ? "Saving..." : "Save"}
         </Button>
       </DialogActions>
       <Snackbar
         open={!!alertMessage}
-        autoHideDuration={6000}
-        onClose={handleAlertClose}
+        autoHideDuration={2000} // Adjust this time as needed
+        onClose={() => {
+          setAlertMessage("");
+          setShouldCloseModal(false);
+        }}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        message={alertMessage}
-      />
+      >
+        <Alert onClose={() => setAlertMessage("")} severity={alertSeverity}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
       <NetworkStatusWarning />
     </Dialog>
   );
