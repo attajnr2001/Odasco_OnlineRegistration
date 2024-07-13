@@ -290,9 +290,9 @@ const ManageStudent = () => {
                   >
                     Edit
                   </Button>
-                  <Button variant="outlined" color="error" size="small">
+                  {/* <Button variant="outlined" color="error" size="small">
                     Delete
-                  </Button>
+                  </Button> */}
                 </TableCell>
               </TableRow>
             ))}
