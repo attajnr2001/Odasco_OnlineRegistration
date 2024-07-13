@@ -2,7 +2,9 @@
 import asyncHandler from "express-async-handler";
 import Student from "../models/Student.js";
 import Program from "../models/Program.js";
-import mongoose from "mongoose";
+import multer from "multer";
+import path from "path";
+import fs from 'fs';
 
 // @desc    Get all student items
 // @route   GET /api/student
@@ -103,11 +105,7 @@ const createStudentItem = asyncHandler(async (req, res) => {
 // @route   PUT /api/student/:id
 // @access  Private
 const updateStudentItem = asyncHandler(async (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.body._id)) {
-    return res.status(400).json({ message: "Invalid student ID" });
-  }
-
-  const studentItem = await Student.findById(req.body._id);
+  const studentItem = await Student.findById(req.params.id);
 
   if (studentItem) {
     // List of all fields in the Student model
@@ -212,6 +210,7 @@ const deleteUnregisteredStudents = asyncHandler(async (req, res) => {
     throw new Error("No unregistered students found");
   }
 });
+
 
 export {
   getStudentItems,

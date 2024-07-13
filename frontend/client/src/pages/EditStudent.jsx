@@ -17,7 +17,7 @@ import {
   districts,
   regions,
   churches,
-  validNationalities,
+  validNationalities, 
 } from "../helpers/constants";
 import "../styles/editStudent.css";
 import { useNavigate } from "react-router-dom";
@@ -286,7 +286,7 @@ const EditStudent = () => {
       setSnackbarMessage("Failed to update student information");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
-      console.error("Failed to update student:", err);
+      console.log("Failed to update student:", err);
     } finally {
       setIsSaving(false);
     }
