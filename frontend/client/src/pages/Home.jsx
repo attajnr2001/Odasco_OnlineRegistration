@@ -6,15 +6,20 @@ import MuiAccordion from "@mui/material/Accordion";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import CircularProgress from "@mui/material/CircularProgress";
 import MuiAccordionSummary from "@mui/material/AccordionSummary";
-import MuiAccordionDetails from "@mui/material/AccordionDetails";
+import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useNavigate, Link } from "react-router-dom";
-
-
+import bg from "/osco back.webp";
 
 const Home = () => {
+  const { data: schoolItems, isLoading: isLoadingSchool } =
+    useGetSchoolItemsQuery();
+
+  const school = schoolItems?.[0];
   return (
-    <>
+    <Box>
       <Box
         display="flex"
         justifyContent="center"
@@ -23,6 +28,18 @@ const Home = () => {
         textAlign="center"
         flexDirection="column"
       >
+        {isLoadingSchool ? (
+          <CircularProgress />
+        ) : (
+          <Avatar
+            src={`${school.logo}`}
+            sx={{
+              width: "100px",
+              height: "100px",
+              marginBottom: 2,
+            }}
+          />
+        )}
         <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
           WELCOME TO THE ONLINE SHS PLATFORM
         </Typography>
@@ -45,7 +62,7 @@ const Home = () => {
         </div>
       </Box>
       <NetworkStatusWarning />
-    </>
+    </Box>
   );
 };
 
