@@ -62,7 +62,7 @@ const Login = () => {
         setError("Your account is inactive. Please contact the administrator.");
       }
     } catch (err) {
-      setError(err?.data?.message || err.error || "Login failed");
+      setError("Invalid Email or Password" || err?.data?.message || err.error);
       console.log(err?.data?.message || err.error);
     } finally {
       setLoading(false);
