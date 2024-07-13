@@ -47,10 +47,12 @@ const EditProgramModal = ({ open, onClose, rowData }) => {
   };
 
   const handleEditProgram = async () => {
+    const uppercaseProgramName = formData.name.toUpperCase();
     try {
       await updateProgramItem({
         id: rowData._id,
         ...formData,
+        name: uppercaseProgramName,
         noOfStudents: parseInt(formData.noOfStudents),
       }).unwrap();
 
@@ -140,6 +142,6 @@ const EditProgramModal = ({ open, onClose, rowData }) => {
       <NetworkStatusWarning />
     </>
   );
-}; 
+};
 
 export default EditProgramModal;

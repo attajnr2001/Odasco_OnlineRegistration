@@ -103,23 +103,6 @@ const EditStudentModal = ({ open, onClose, student, houses, programs }) => {
             src={formData.photo || ""}
             alt="Student Image"
           />
-
-          <input
-            accept="image/*"
-            id="icon-button-file"
-            type="file"
-            style={{ display: "none" }}
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-          <label htmlFor="icon-button-file">
-            <IconButton
-              color="primary"
-              aria-label="upload picture"
-              component="span"
-            >
-              <Camera />
-            </IconButton>
-          </label>
         </Box>
 
         <TextField

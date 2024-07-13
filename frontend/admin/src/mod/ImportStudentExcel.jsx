@@ -58,13 +58,17 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
             aggregate: student["Aggregate"] || "",
             dateOfBirth: student["Date of Birth(dd/mm/yyyy)"] || "",
             otherNames: student["Other Names"] || "",
-            gender: student["Gender"] || "",
+            gender:
+              (student["Gender"] || "").charAt(0).toUpperCase() +
+              (student["Gender"] || "").slice(1).toLowerCase(),
             jhsAttended: student["JHS Attended"] || "",
             indexNumber: student["JHS Index No"],
             surname: student["Surname"] || "",
-            program: student["Programme"] || "",
+            program: (student["Programme"] || "").toUpperCase(),
             smsContact: student["SMS Contact"] || "",
-            status: student["Boarding Status"] || "Day",
+            status:
+              (student["Boarding Status"] || "Day").charAt(0).toUpperCase() +
+              (student["Boarding Status"] || "Day").slice(1).toLowerCase(),
             completed: false,
             hasPaid: false,
             year: studentYear,

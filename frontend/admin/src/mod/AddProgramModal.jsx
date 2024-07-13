@@ -38,6 +38,7 @@ const AddProgramModal = ({ open, onClose, onAddProgram }) => {
   };
 
   const handleAddProgram = async () => {
+    const uppercaseProgramName = formData.name.toUpperCase();
     console.log(formData.programID);
     if (
       !formData.name ||
@@ -51,6 +52,7 @@ const AddProgramModal = ({ open, onClose, onAddProgram }) => {
     try {
       const result = await addProgramItem({
         ...formData,
+        name: uppercaseProgramName,
         noOfStudents: parseInt(formData.noOfStudents),
       }).unwrap();
 
