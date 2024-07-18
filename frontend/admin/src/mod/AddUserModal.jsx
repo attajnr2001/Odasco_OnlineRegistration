@@ -11,12 +11,11 @@ import {
   Alert,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useAddUserMutation } from "../slices/usersApiSlice";
 
 const AddUserModal = ({ open, onClose, onAddUser }) => {
   const [error, setError] = useState(null);
-  const locationIP = useLocationIP();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -27,7 +26,8 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
   const [addUser] = useAddUserMutation();
 
   const handleSubmit = async (e) => {
@@ -39,7 +39,21 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
       return;
     }
     try {
-      await addUser({ name, email, password, role, phone }).unwrap(); // Include role in the mutation
+      const result = await addUser({
+        name,
+        email,
+        password,
+        role,
+        phone,
+      }).unwrap();
+
+      // Add log entry
+      if (!ipLoading) {
+        await createLog("New User Added", result._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
+
       setSnackbarMessage("User added successfully");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);
@@ -51,6 +65,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
       setOpenSnackbar(true);
     }
   };
+
   useEffect(() => {
     if (open) {
       setEmail("");
@@ -99,8 +114,8 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
           type="password"
           fullWidth
           margin="normal"
-          value={password}
-          onChange={handlePasswordChange}
+          value={"123456"}
+          // onChange={handlePasswordChange}
         />
         <TextField
           required

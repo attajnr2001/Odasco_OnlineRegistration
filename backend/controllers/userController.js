@@ -59,10 +59,10 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid user data");
   }
 });
-
+  
 const toggleUserStatus = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
-
+  
   if (user) {
     user.status = user.status === "active" ? "inactive" : "active";
     const updatedUser = await user.save();

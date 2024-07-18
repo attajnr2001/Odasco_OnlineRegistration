@@ -12,7 +12,7 @@ import {
   Alert,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useAddHouseItemMutation } from "../slices/houseApiSlice";
 
 const AddHouseModal = ({ open, onClose, onAddHouse }) => {
@@ -25,9 +25,8 @@ const AddHouseModal = ({ open, onClose, onAddHouse }) => {
     bedCapacity: "",
   });
   const [error, setError] = useState(null);
-  const locationIP = useLocationIP();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,11 +37,7 @@ const AddHouseModal = ({ open, onClose, onAddHouse }) => {
   };
 
   const handleAddHouse = async () => {
-    if (
-      !formData.name ||
-      !formData.gender ||
-      !formData.bedCapacity
-    ) {
+    if (!formData.name || !formData.gender || !formData.bedCapacity) {
       setError("All fields are required.");
       return;
     }
@@ -53,6 +48,13 @@ const AddHouseModal = ({ open, onClose, onAddHouse }) => {
         noOfStudents: parseInt(formData.noOfStudents),
         bedCapacity: parseInt(formData.bedCapacity),
       }).unwrap();
+
+      // Add log entry
+      if (!ipLoading) {
+        await createLog("New House Added", result._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
 
       setSnackbarMessage("House added successfully");
       setSnackbarOpen(true);
@@ -140,7 +142,7 @@ const AddHouseModal = ({ open, onClose, onAddHouse }) => {
           </Alert>
         </Snackbar>
       )}
-      <Snackbar
+      {/* <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -152,7 +154,7 @@ const AddHouseModal = ({ open, onClose, onAddHouse }) => {
         >
           {snackbarMessage}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
       <NetworkStatusWarning />
     </Dialog>
   );

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { TextField, Button, Snackbar, Alert } from "@mui/material";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
-import { useLocationIP, getPlatform } from "../helpers/utils";
 import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useUpdateSchoolItemMutation } from "../slices/schoolApiSlice";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 
 const EditSchoolDetails = () => {
   const [name, setName] = useState("");
@@ -14,7 +14,8 @@ const EditSchoolDetails = () => {
   const [helpDeskNo, setHelpDeskNo] = useState("");
   const [box, setBox] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const locationIP = useLocationIP();
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
   const { currentUser } = true;
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -63,6 +64,17 @@ const EditSchoolDetails = () => {
         id: schoolItems[0]._id,
         ...updatedSchool,
       }).unwrap();
+
+      // Add log entry
+      if (!ipLoading) {
+        await createLog(
+          "School Details Updated",
+          schoolItems[0]._id,
+          locationIP
+        );
+      } else {
+        console.log("IP address not available yet");
+      }
 
       setSnackbarMessage("School details updated successfully!");
       setSnackbarSeverity("success");

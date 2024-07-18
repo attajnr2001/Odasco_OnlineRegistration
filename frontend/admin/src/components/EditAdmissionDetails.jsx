@@ -8,9 +8,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
-import { useParams } from "react-router-dom";
-import { useLocationIP, getPlatform } from "../helpers/utils";
-
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useUpdateSchoolItemMutation } from "../slices/schoolApiSlice";
 
@@ -37,6 +35,8 @@ const EditAdmissionDetails = () => {
   const [announcementTextFields, setAnnouncementTextFields] = useState([
     { value: "" },
   ]);
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
   const [admissionOpeningDateTime, setAdmissionOpeningDateTime] = useState("");
   const [schOpeningDateTime, setSchOpeningDateTime] = useState("");
   const [announcements, setAnnouncements] = useState([]);
@@ -60,8 +60,6 @@ const EditAdmissionDetails = () => {
     newAnnouncements[index] = value;
     setAnnouncements(newAnnouncements);
   };
-
-  const locationIP = useLocationIP();
 
   const {
     data: schoolItems,
@@ -144,11 +142,22 @@ const EditAdmissionDetails = () => {
         admissionStatus: newAdmissionStatus,
       }));
 
-      setAlertMessage("School details updated successfully!");
+      // Add log entry
+      if (!ipLoading) {
+        await createLog(
+          "Admission Details Updated",
+          schoolItems[0]._id,
+          locationIP
+        );
+      } else {
+        console.log("IP address not available yet");
+      }
+
+      setAlertMessage("Admission details updated successfully!");
       setAlertSeverity("success");
     } catch (error) {
-      console.error("Error updating school details:", error);
-      setAlertMessage("Error updating school details: " + error.message);
+      console.error("Error updating admission details:", error);
+      setAlertMessage("Error updating admission details: " + error.message);
       setAlertSeverity("error");
     } finally {
       setIsUpdating(false);

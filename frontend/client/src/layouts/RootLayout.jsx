@@ -10,7 +10,7 @@ const RootLayout = () => {
     <div>
       <Navbar />
       <Box sx={{ marginBottom: "5em" }}></Box>
-      <Container>
+      <Container maxWidth= "xl">
         <Outlet />
 
         <Box

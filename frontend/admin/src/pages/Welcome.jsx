@@ -20,7 +20,7 @@ const Welcome = () => {
   return (
     <Box
       sx={{
-        height: "85vh",
+        height: "100vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -88,16 +88,11 @@ const Welcome = () => {
                 borderRadius: "5px",
               }}
             >
-              We are delighted to have you on board for the Senior High School
-              online admission process. Our platform is designed to provide you
-              with a seamless and efficient experience as you navigate through
-              the application and admission stages. Whether you are here to
-              apply for a new admission, check the status of your application,
-              or manage other administrative tasks, our system is equipped to
-              assist you at every step. Should you need any support, do not
-              hesitate to reach out to our help desk. Thank you for choosing our
-              platform, and we look forward to supporting your educational
-              journey.
+              Welcome to Oda Senior High School's Admin Portal. This system
+              allows you to manage online admissions efficiently. Review
+              applications, update statuses, and handle enrollment tasks here.
+              For technical support, contact our IT team. Your work is vital to
+              our admissions process and school standards.
             </Typography>
             <Button
               color="primary"

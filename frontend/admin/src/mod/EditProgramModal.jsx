@@ -9,12 +9,15 @@ import {
   Snackbar,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useLocationIP, getPlatform } from "../helpers/utils";
-import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
+import { useLocationIP, getPlatform, useCreateLog } from "../helpers/utils";
+import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import { useUpdateProgramItemMutation } from "../slices/programApiSlice";
 
 const EditProgramModal = ({ open, onClose, rowData }) => {
   const [updateProgramItem, { isLoading }] = useUpdateProgramItemMutation();
+  const createLog = useCreateLog();
+  const { locationIP, loading: ipLoading } = useLocationIP();
+
   const [formData, setFormData] = useState({
     programID: "",
     name: "",
@@ -25,7 +28,6 @@ const EditProgramModal = ({ open, onClose, rowData }) => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const locationIP = useLocationIP();
 
   useEffect(() => {
     if (rowData) {
@@ -49,7 +51,7 @@ const EditProgramModal = ({ open, onClose, rowData }) => {
   const handleEditProgram = async () => {
     const uppercaseProgramName = formData.name.toUpperCase();
     try {
-      await updateProgramItem({
+      const result = await updateProgramItem({
         id: rowData._id,
         ...formData,
         name: uppercaseProgramName,
@@ -59,6 +61,14 @@ const EditProgramModal = ({ open, onClose, rowData }) => {
       setSnackbarMessage("Program updated successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
+
+      // Add log entry
+      if (!ipLoading) {
+        await createLog("Program updated", result._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
+
       onClose();
     } catch (error) {
       console.error("Error updating program:", error);

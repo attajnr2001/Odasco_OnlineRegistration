@@ -9,6 +9,7 @@ import {
   Paper,
   Button,
   CircularProgress,
+  Snackbar,
   Alert,
 } from "@mui/material";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
@@ -23,18 +24,17 @@ import {
   useToggleUserStatusMutation,
 } from "../slices/usersApiSlice";
 import { useSelector } from "react-redux";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 
 const Users = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
-  const [loading, setLoading] = useState(true);
-  // const locationIP = useLocationIP();
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [updating, setUpdating] = useState(false);
 
   const { data: users, isLoading, error, refetch } = useGetUsersQuery();
@@ -44,22 +44,44 @@ const Users = () => {
 
   const handleToggleStatus = async (userId) => {
     if (userInfo.status === "user") {
-      setOpenSnackbar(true);
+      setSnackbarMessage("You don't have permission to perform this action.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
       return;
     }
 
     try {
-      await toggleUserStatus(userId).unwrap();
+      const result = await toggleUserStatus(userId).unwrap();
       refetch();
+
+      // Add log entry
+      if (!ipLoading) {
+        await createLog("User Status Toggled", userId, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
+
+      // Set Snackbar message and open it
+      setSnackbarMessage(
+        `User status ${
+          result.status === "active" ? "activated" : "deactivated"
+        } successfully.`
+      );
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
     } catch (err) {
       console.error("Failed to toggle user status:", err);
+      setSnackbarMessage("Failed to toggle user status. Please try again.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
+
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-    setOpenSnackbar(false);
+    setSnackbarOpen(false);
   };
 
   if (isLoading) return <CircularProgress />;
@@ -213,6 +235,21 @@ const Users = () => {
         // onAddUser={handleAddUser}
         // selectedUser={selectedUser}
       />
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
       <NetworkStatusWarning />
     </div>

@@ -9,7 +9,7 @@ import {
 } from "firebase/storage";
 import { useParams } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, getPlatform, useCreateLog } from "../helpers/utils";
 import { storage } from "../helpers/firebase";
 import {
   useGetSchoolItemsQuery,
@@ -25,6 +25,8 @@ const Prospectus = () => {
   const [showPreview, setShowPreview] = useState(false);
   const { data: schoolItems, isLoading, error } = useGetSchoolItemsQuery();
   const [updateSchoolItem] = useUpdateSchoolItemMutation();
+  const createLog = useCreateLog();
+  const { locationIP, loading: ipLoading } = useLocationIP();
 
   const resetSuccessMessage = () => {
     setTimeout(() => {

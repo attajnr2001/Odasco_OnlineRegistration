@@ -56,13 +56,13 @@ const updateHouseItem = asyncHandler(async (req, res) => {
 // @route   DELETE /api/house/:id
 // @access  Private
 const deleteHouseItem = asyncHandler(async (req, res) => {
-  try {
+  try { 
     const houseItem = await House.findById(req.params.id);
 
     if (houseItem) {
       await House.deleteOne({ _id: req.params.id });
       res.json({ message: "House item removed" });
-    } else {
+    } else {  
       res.status(404);
       throw new Error("House item not found");
     }

@@ -18,16 +18,16 @@ import {
   TableSortLabel,
   TablePagination,
   Box,
+  Snackbar,
 } from "@mui/material";
 import AddProgramModal from "../mod/AddProgramModal";
 import EditProgramModal from "../mod/EditProgramModal";
-import { useParams } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { visuallyHidden } from "@mui/utils";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, getPlatform, useCreateLog } from "../helpers/utils";
 import {
   useGetProgramItemsQuery,
   useAddProgramItemMutation,
@@ -41,12 +41,16 @@ const Programs = () => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("programID");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
-  const locationIP = useLocationIP();
+  const createLog = useCreateLog();
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const {
     data: programItems,
@@ -54,6 +58,16 @@ const Programs = () => {
     isError,
     error,
   } = useGetProgramItemsQuery();
+
+  useEffect(() => {
+    if (programItems) {
+      setPrograms(programItems);
+    }
+  }, [programItems]);
+
+  const handleAddProgram = (newProgram) => {
+    setPrograms([...programs, newProgram]);
+  };
   const [deleteProgramItem] = useDeleteProgramItemMutation();
 
   if (isLoading) {
@@ -91,17 +105,34 @@ const Programs = () => {
       await deleteProgramItem(selectedRow._id).unwrap();
       setSnackbarMessage("Program deleted successfully");
       setSnackbarSeverity("success");
-      setOpenSnackbar(true);
+      setSnackbarOpen(true);
+      setPrograms(
+        programs.filter((program) => program._id !== selectedRow._id)
+      );
+
+      // Log the deletion
+      if (!ipLoading) {
+        await createLog("Program deleted", selectedRow._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
     } catch (error) {
       console.error("Error deleting program:", error);
       setSnackbarMessage(
-        "Error deleting program: " + error.data?.message || error.error
+        "Error deleting program: " + (error.data?.message || error.error)
       );
       setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      setSnackbarOpen(true);
     }
 
     setOpenDeleteConfirmation(false);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   const handleExportCSV = () => {
@@ -166,10 +197,7 @@ const Programs = () => {
     );
   }
 
-  const sortedPrograms = stableSort(
-    programItems,
-    getComparator(order, orderBy)
-  );
+  const sortedPrograms = stableSort(programs, getComparator(order, orderBy));
 
   return (
     <div>
@@ -347,6 +375,7 @@ const Programs = () => {
       <AddProgramModal
         open={openAddModal}
         onClose={() => setOpenAddModal(false)}
+        onAddProgram={handleAddProgram}
       />
       <EditProgramModal
         open={openEditModal}
@@ -378,6 +407,20 @@ const Programs = () => {
         </DialogActions>
       </Dialog>
       <NetworkStatusWarning />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

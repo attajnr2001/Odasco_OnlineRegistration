@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { TextField, Button, MenuItem, Alert, Snackbar } from "@mui/material";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useUpdateSchoolItemMutation } from "../slices/schoolApiSlice";
 
 const EditStudentDetails = () => {
-
   const [studentData, setStudentData] = useState({
     showMedicalUndertaking: false,
     showProgramSubject: false,
@@ -15,7 +14,8 @@ const EditStudentDetails = () => {
     programSubjectCaption: "",
     notes: "",
   });
-
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
   const {
     data: schoolItems,
     isLoading,
@@ -26,7 +26,6 @@ const EditStudentDetails = () => {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const locationIP = useLocationIP();
   const { currentUser } = true;
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertSeverity, setAlertSeverity] = useState("success");
@@ -76,11 +75,22 @@ const EditStudentDetails = () => {
         ...updatedSchool,
       }).unwrap();
 
-      setAlertMessage("School details updated successfully!");
+      // Add log entry
+      if (!ipLoading) {
+        await createLog(
+          "Student Details Updated",
+          schoolItems[0]._id,
+          locationIP
+        );
+      } else {
+        console.log("IP address not available yet");
+      }
+
+      setAlertMessage("Student details updated successfully!");
       setAlertSeverity("success");
     } catch (error) {
-      console.error("Error updating school details:", error);
-      setAlertMessage("Error updating school details: " + error.message);
+      console.error("Error updating student details:", error);
+      setAlertMessage("Error updating student details: " + error.message);
       setAlertSeverity("error");
     } finally {
       setIsUpdating(false);
