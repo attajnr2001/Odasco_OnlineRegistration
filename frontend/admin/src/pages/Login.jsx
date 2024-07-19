@@ -45,9 +45,11 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     try {
       const res = await login({ email, password }).unwrap();
+
       if (res.status === "active") {
         dispatch(setCredentials({ ...res }));
 

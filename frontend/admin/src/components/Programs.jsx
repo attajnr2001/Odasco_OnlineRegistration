@@ -142,7 +142,7 @@ const Programs = () => {
         ProgramID: program.programID,
         ProgramName: program.name,
         ShortName: program.shortName,
-        NumberOfStudents: program.programID,
+        NumberOfStudents: program.noOfStudents,
       }))
     );
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
@@ -157,7 +157,7 @@ const Programs = () => {
   };
 
   const handleExportPDF = () => {
-    console.log("pdf printing");
+  console.log("pdf printing");
     const doc = new jsPDF();
     doc.text("Programs Table", 20, 10);
     doc.autoTable({
@@ -168,7 +168,7 @@ const Programs = () => {
         program.programID,
         program.name,
         program.shortName,
-        program.programID,
+        program.noOfStudents,
       ]),
     });
     doc.save("programs.pdf");
@@ -182,7 +182,7 @@ const Programs = () => {
         ProgramID: program.programID,
         ProgramName: program.name,
         ShortName: program.shortName,
-        NumberOfStudents: program.programID,
+        NumberOfStudents: program.noOfStudents,
       }))
     );
     XLSX.utils.book_append_sheet(workBook, workSheet, "Programs");

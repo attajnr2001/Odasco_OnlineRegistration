@@ -7,12 +7,16 @@ import {
   Grid,
   Snackbar,
 } from "@mui/material";
+import { useSelector } from "react-redux";
+
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useUpdateSchoolItemMutation } from "../slices/schoolApiSlice";
 
 const EditAdmissionDetails = () => {
+  const { userInfo } = useSelector((state) => state.auth);
+
   const [admissionData, setAdmissionData] = useState({
     senderID: "",
     year: "",
@@ -113,7 +117,8 @@ const EditAdmissionDetails = () => {
     }
 
     try {
-      const newAdmissionStatus = checkAdmissionStatus(admissionOpeningDateTime);
+      // Use the manually set admission status instead of calculating it
+      const newAdmissionStatus = admissionData.admissionStatus;
 
       const updatedSchool = {
         senderID: admissionData.senderID,
@@ -141,7 +146,7 @@ const EditAdmissionDetails = () => {
         ...prevData,
         admissionStatus: newAdmissionStatus,
       }));
-
+      
       // Add log entry
       if (!ipLoading) {
         await createLog(
@@ -326,7 +331,7 @@ const EditAdmissionDetails = () => {
           ))}
         </TextField>
 
-        <TextField
+        {/* <TextField
           label="Admission Opening Date and Time"
           type="datetime-local"
           fullWidth
@@ -336,7 +341,7 @@ const EditAdmissionDetails = () => {
           InputLabelProps={{
             shrink: true,
           }}
-        />
+        /> */}
 
         <TextField
           label="School Opening Date and Time"
@@ -415,15 +420,17 @@ const EditAdmissionDetails = () => {
           </Grid>
         </Grid>
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          sx={{ marginBottom: "1em" }}
-          disabled={isUpdating}
-        >
-          {isUpdating ? "Updating..." : "Update"}
-        </Button>
+        {userInfo.role === "super" && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            sx={{ marginBottom: "1em" }}
+            disabled={isUpdating}
+          >
+            {isUpdating ? "Updating..." : "Update"}
+          </Button>
+        )}
 
         <Snackbar
           open={snackbarOpen}

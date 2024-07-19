@@ -130,7 +130,6 @@ const Login = () => {
   //   } else {
   //   }
   // }, [navigate, clientInfo]);
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -141,7 +140,10 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const res = await login({ indexNumber }).unwrap();
+      // Remove the last two digits from the index number
+      const truncatedIndexNumber = indexNumber.slice(0, -2);
+
+      const res = await login({ indexNumber: truncatedIndexNumber }).unwrap();
 
       if (!res.hasPaid) {
         payment(res);

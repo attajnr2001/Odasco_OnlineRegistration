@@ -24,6 +24,7 @@ const EditProfile = ({ open, onClose, user }) => {
   const [message, setMessage] = useState(null);
   const createLog = useCreateLog();
   const { locationIP, loading: ipLoading } = useLocationIP();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
   const [updateProfile, { isLoading }] = useUpdateUserProfileMutation();

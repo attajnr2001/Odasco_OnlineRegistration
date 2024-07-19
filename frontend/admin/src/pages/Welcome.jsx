@@ -88,11 +88,12 @@ const Welcome = () => {
                 borderRadius: "5px",
               }}
             >
-              Welcome to Oda Senior High School's Admin Portal. This system
-              allows you to manage online admissions efficiently. Review
-              applications, update statuses, and handle enrollment tasks here.
-              For technical support, contact our IT team. Your work is vital to
-              our admissions process and school standards.
+              This Portal allows you to manage online admissions efficiently.{" "}
+              <br />
+              Kindly review applications, update statuses, and handle enrollment
+              tasks here.
+              <br /> For technical support, contact our IT team. <br /> Your
+              work is vital to our admission process and school
             </Typography>
             <Button
               color="primary"

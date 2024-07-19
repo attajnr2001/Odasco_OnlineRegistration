@@ -151,17 +151,19 @@ const Users = () => {
 
   return (
     <div style={{ minHeight: "86vh" }}>
-      <div className="house-buttons-container">
-        <Button
-          sx={{ mb: 2 }}
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={() => setOpenAddModal(true)}
-        >
-          Add New User
-        </Button>
-      </div>
+      {userInfo.role === "super" && (
+        <div className="house-buttons-container">
+          <Button
+            sx={{ mb: 2 }}
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => setOpenAddModal(true)}
+          >
+            Add New User
+          </Button>
+        </div>
+      )}
 
       <div className="house-buttons" style={{ marginBottom: "2rem" }}>
         <Button
@@ -200,7 +202,9 @@ const Users = () => {
                 <TableCell align="center">Phone</TableCell>
                 <TableCell align="center">Role</TableCell>
                 <TableCell align="center">Status</TableCell>
-                <TableCell align="center">Actions</TableCell>
+                {userInfo.role === "super" && (
+                  <TableCell align="center">Actions</TableCell>
+                )}{" "}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -210,18 +214,21 @@ const Users = () => {
                   <TableCell align="center">{user.name}</TableCell>
                   <TableCell align="center">{user.phone}</TableCell>
                   <TableCell align="center">{user.role}</TableCell>
-                  <TableCell>{user.status}</TableCell>
+                  <TableCell align="center">{user.status}</TableCell>
 
-                  <TableCell>
-                    <Button
-                      variant="outlined"
-                      color={user.status === "active" ? "secondary" : "primary"}
-                      onClick={() => handleToggleStatus(user._id)}
-                      disabled={user.role === "super"}
-                    >
-                      {user.status === "active" ? "Deactivate" : "Activate"}
-                    </Button>
-                  </TableCell>
+                  {userInfo.role === "super" && (
+                    <TableCell>
+                      <Button
+                        variant="outlined"
+                        color={
+                          user.status === "active" ? "secondary" : "primary"
+                        }
+                        onClick={() => handleToggleStatus(user._id)}
+                      >
+                        {user.status === "active" ? "Deactivate" : "Activate"}
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

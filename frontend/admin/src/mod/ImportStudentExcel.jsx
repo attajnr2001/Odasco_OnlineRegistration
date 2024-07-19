@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import * as XLSX from "xlsx";
 import { useAddStudentItemMutation } from "../slices/studentApiSlice";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, getPlatform, useCreateLog } from "../helpers/utils";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import dayjs from "dayjs";
 
@@ -19,6 +19,7 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const locationIP = useLocationIP();
+  const createLog = useCreateLog();
   const [addStudentItem] = useAddStudentItemMutation();
   const [studentYear, setStudentYear] = useState(dayjs().year());
 
@@ -88,9 +89,11 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
           }));
 
           // Save students to the database
+          let importedCount = 0;
           for (const student of studentsWithProgramIds) {
             try {
               await addStudentItem(student).unwrap();
+              importedCount++;
             } catch (err) {
               console.error(`Error adding student: ${err}`);
               // Optionally, you can set an error state here to show to the user
@@ -98,6 +101,11 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
           }
 
           console.log("Students saved successfully");
+          await createLog(
+            `Imported ${importedCount} students`,
+            schoolID,
+            locationIP
+          );
           onClose(); // Close the dialog after successful upload
         }
       } catch (error) {

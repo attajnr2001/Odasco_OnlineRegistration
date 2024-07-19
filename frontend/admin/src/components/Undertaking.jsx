@@ -7,9 +7,8 @@ import {
   listAll,
   deleteObject,
 } from "firebase/storage";
-import { useParams } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, getPlatform, useCreateLog } from "../helpers/utils";
 import { storage } from "../helpers/firebase"; // Make sure to import your Firebase storage instance
 import {
   useGetSchoolItemsQuery,
@@ -20,7 +19,8 @@ const Undertaking = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadError, setUploadError] = useState(null);
   const [undertakingURL, setUndertakingURL] = useState(null);
-  const locationIP = useLocationIP();
+  const createLog = useCreateLog();
+  const { locationIP, loading: ipLoading } = useLocationIP();
   const [showPreview, setShowPreview] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
@@ -123,6 +123,13 @@ const Undertaking = () => {
               setSuccessMessage(
                 "Undertaking uploaded and school record updated successfully!"
               );
+
+              // Add log entry
+              if (!ipLoading) {
+                await createLog("Undertaking updated", schoolId, locationIP);
+              } else {
+                console.log("IP address not available yet");
+              }
             } else {
               throw new Error("No school found to update");
             }
@@ -143,6 +150,7 @@ const Undertaking = () => {
     }
   };
 
+  
   useEffect(() => {
     if (schoolItems && schoolItems.length > 0) {
       setUndertakingURL(schoolItems[0].undertaking);
@@ -150,7 +158,7 @@ const Undertaking = () => {
   }, [schoolItems]);
 
   return (
-    <Box sx={{mt: 2}} className="file">
+    <Box sx={{ mt: 2 }} className="file">
       {isLoading ? (
         <p>Loading...</p>
       ) : error ? (

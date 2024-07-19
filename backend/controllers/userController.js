@@ -61,7 +61,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
   
 const toggleUserStatus = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id); 
   
   if (user) {
     user.status = user.status === "active" ? "inactive" : "active";

@@ -4,6 +4,7 @@ import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import th
 import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useUpdateSchoolItemMutation } from "../slices/schoolApiSlice";
+import { useSelector } from "react-redux";
 
 const EditStudentDetails = () => {
   const [studentData, setStudentData] = useState({
@@ -23,7 +24,7 @@ const EditStudentDetails = () => {
     error,
   } = useGetSchoolItemsQuery();
   const [updateSchoolItem] = useUpdateSchoolItemMutation();
-
+  const { userInfo } = useSelector((state) => state.auth);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const { currentUser } = true;
@@ -208,15 +209,17 @@ const EditStudentDetails = () => {
             shrink: true,
           }}
         />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          disabled={isUpdating}
-          sx={{ marginBottom: "1em" }}
-        >
-          {isUpdating ? "Updating..." : "Update"}
-        </Button>
+        {userInfo.role === "super" && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={isUpdating}
+            sx={{ marginBottom: "1em" }}
+          >
+            {isUpdating ? "Updating..." : "Update"}
+          </Button>
+        )}
 
         <Snackbar
           open={snackbarOpen}

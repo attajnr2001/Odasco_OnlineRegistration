@@ -16,7 +16,6 @@ const studentSchema = mongoose.Schema(
     },
     otherNames: {
       type: String,
-      required: true,
     },
     gender: { type: String, enum: ["Male", "Female"], required: true },
     indexNumber: {
@@ -32,7 +31,6 @@ const studentSchema = mongoose.Schema(
     },
     surname: {
       type: String,
-      required: true,
     },
     smsContact: {
       type: String,
@@ -137,6 +135,5 @@ const studentSchema = mongoose.Schema(
 );
 
 const Student = mongoose.model("Student", studentSchema);
-
 
 export default Student;

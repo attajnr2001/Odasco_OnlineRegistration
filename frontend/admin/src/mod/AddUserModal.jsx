@@ -13,9 +13,13 @@ import {
 import { useParams } from "react-router-dom";
 import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useAddUserMutation } from "../slices/usersApiSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const AddUserModal = ({ open, onClose, onAddUser }) => {
   const [error, setError] = useState(null);
+  const { userInfo } = useSelector((state) => state.auth);
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -25,7 +29,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("123456");
   const { locationIP, loading: ipLoading } = useLocationIP();
   const createLog = useCreateLog();
   const [addUser] = useAddUserMutation();
@@ -47,7 +51,6 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
         phone,
       }).unwrap();
 
-      // Add log entry
       if (!ipLoading) {
         await createLog("New User Added", result._id, locationIP);
       } else {
@@ -114,7 +117,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
           type="password"
           fullWidth
           margin="normal"
-          value={"123456"}
+          value={password}
           // onChange={handlePasswordChange}
         />
         <TextField

@@ -11,8 +11,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, getPlatform, useCreateLog } from "../helpers/utils";
 import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 import { useAddStudentItemMutation } from "../slices/studentApiSlice";
 
@@ -28,7 +27,8 @@ const AddStudentModal = ({ open, onClose }) => {
   const [jhsAttended, setJhsAttended] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const locationIP = useLocationIP();
+  const createLog = useCreateLog();
+  const { locationIP, loading: ipLoading } = useLocationIP();
   const [studentYear, setStudentYear] = useState(dayjs().year());
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -58,7 +58,6 @@ const AddStudentModal = ({ open, onClose }) => {
       return;
     }
 
-    // Format the date to ISO string
     const formattedDateOfBirth = new Date(dateOfBirth).toISOString();
 
     try {
@@ -74,6 +73,14 @@ const AddStudentModal = ({ open, onClose }) => {
         year: studentYear,
         jhsAttended,
       }).unwrap();
+
+      // Add log entry
+      if (!ipLoading) {
+        await createLog("Student added", result._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
+
       setSnackbarMessage(
         `User added successfully. Admission Number: ${result.admissionNo}`
       );
@@ -218,7 +225,7 @@ const AddStudentModal = ({ open, onClose }) => {
             required
             label="Aggregate of best 6"
             name="aggregate"
-          type="number"
+            type="number"
             fullWidth
             margin="normal"
             value={aggregate}

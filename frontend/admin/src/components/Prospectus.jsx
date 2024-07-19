@@ -124,6 +124,13 @@ const Prospectus = () => {
               setSuccessMessage(
                 "Prospectus uploaded and school record updated successfully!"
               );
+
+              // Add log entry
+              if (!ipLoading) {
+                await createLog("Prospectus updated", schoolId, locationIP);
+              } else {
+                console.log("IP address not available yet");
+              }
             } else {
               throw new Error("No school found to update");
             }
@@ -144,6 +151,7 @@ const Prospectus = () => {
     }
   };
 
+  
   useEffect(() => {
     if (schoolItems && schoolItems.length > 0) {
       setProspectusURL(schoolItems[0].prospectus);

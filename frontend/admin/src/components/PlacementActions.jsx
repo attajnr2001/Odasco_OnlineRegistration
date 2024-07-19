@@ -22,6 +22,7 @@ import {
   DialogTitle,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import AddStudentModal from "../mod/AddStudentModal";
 import ImportStudentExcel from "../mod/ImportStudentExcel";
@@ -36,10 +37,12 @@ import {
   useDeleteStudentItemMutation,
   useGetRecentStudentsQuery,
 } from "../slices/studentApiSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetProgramItemsQuery } from "../slices/programApiSlice";
 
 const PlacementActions = () => {
   const [page, setPage] = useState(0);
+
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openAddStudentModal, setOpenAddStudentModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,14 +54,15 @@ const PlacementActions = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const locationIP = useLocationIP();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const {
     data: studentItems,
     isLoading,
     isError,
     error,
-  } = useGetStudentItemsQuery();
-  const { data: recentStudents, isLoading: isLoadingRecent } =
+ a } = useGetStudentItemsQuery();
+   const { data: recentStudents, isLoading: isLoadingRecent } =
     useGetRecentStudentsQuery();
   const [deleteUnregisteredStudents, { isLoading: isDeleting }] =
     useDeleteUnregisteredStudentsMutation();
@@ -221,44 +225,67 @@ const PlacementActions = () => {
   return (
     <div>
       <Grid container spacing={2} alignItems="center">
+        {userInfo.role === "super" && (
+          <Grid item>
+            <Tooltip title="Add a new student record manually(Protocol)" arrow>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => setOpenAddStudentModal(true)}
+              >
+                Add New Single Record
+              </Button>
+            </Tooltip>
+          </Grid>
+        )}
+
         <Grid item>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => setOpenAddStudentModal(true)}
-          >
-            Add New Single Record
-          </Button>
+          <Tooltip title="Import Students automatically placed" arrow>
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={handleImportButtonClick}
+            >
+              Import from CSSPS Excel
+            </Button>
+          </Tooltip>
         </Grid>
 
         <Grid item>
-          <Button
-            variant="outlined"
-            color="success"
-            onClick={handleImportButtonClick}
+          <Tooltip
+            title="Download a PDF of recently imported student records"
+            arrow
           >
-            Import from CSSPS Excel
-          </Button>
+            <span>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handlePDFExport}
+                disabled={isLoadingRecent}
+              >
+                {isLoadingRecent
+                  ? "Loading..."
+                  : "Download Recently Imported List"}
+              </Button>
+            </span>
+          </Tooltip>
         </Grid>
+
         <Grid item>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handlePDFExport}
-            disabled={isLoadingRecent}
-          >
-            {isLoadingRecent ? "Loading..." : "Download Recently Imported List"}
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={handleDeleteUnregisteredStudents}
-            disabled={isDeleting}
-          >
-            {isDeleting ? "Deleting..." : "Delete All Unregistered Placement"}
-          </Button>
+          <Tooltip title="Remove all unregistered student placements" arrow>
+            <span>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleDeleteUnregisteredStudents}
+                disabled={isDeleting}
+              >
+                {isDeleting
+                  ? "Deleting..."
+                  : "Delete All Unregistered Placement"}
+              </Button>
+            </span>
+          </Tooltip>
         </Grid>
       </Grid>
       <Grid
