@@ -3,6 +3,7 @@ import asyncHandler from "express-async-handler";
 import Student from "../models/Student.js";
 import generateToken from "../utils/generateToken.js";
 
+
 const authClient = asyncHandler(async (req, res) => {
   console.log("authClient called");
 

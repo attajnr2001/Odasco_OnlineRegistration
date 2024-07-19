@@ -171,7 +171,7 @@ const Login = () => {
 
     const payStack = new PaystackPop();
     payStack.newTransaction({
-      key: "pk_test_dda1b090ed301a7df8b0b7ed0e066912824d04d5",
+      key: process.env.PAYSTACK_TEST_KEY,
       amount: school.serviceCharge * 100,
       email: "attajnr731@gmail.com",
       onSuccess: () => handlePaymentSuccess(studentData),
