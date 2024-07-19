@@ -11,6 +11,7 @@ import { Box } from "@mui/system";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Drawer from "@mui/material/Drawer";
+import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -35,12 +36,31 @@ const HideOnScroll = (props) => {
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [admissionYear, setAdmissionYear] = useState(null);
+  const [schoolShortName, setSchoolShortName] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
+  const {
+    data: schoolItems,
+    isLoading,
+    isError,
+    error,
+  } = useGetSchoolItemsQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Please Login Again...</div>;
 
   const { clientInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [logoutApiCall] = useLogoutMutation();
+
+  useEffect(() => {
+    if (schoolItems && schoolItems.length > 0) {
+      const school = schoolItems[0];
+      setSchoolShortName(school.shortName || "");
+      setAdmissionYear(school.academicYear || "");
+    }
+  }, []);
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
@@ -96,7 +116,8 @@ const Navbar = () => {
                 ml: 1,
               }}
             >
-              ODASCO 2024
+              {schoolShortName ? schoolShortName : ""}
+              {admissionYear && ` ${admissionYear}`}
             </Typography>
 
             <Box sx={{ display: { xs: "none", md: "flex" }, gap: "10px" }}>

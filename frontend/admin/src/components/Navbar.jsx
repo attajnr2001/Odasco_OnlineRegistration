@@ -20,13 +20,13 @@ import { logout } from "../slices/authSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "../slices/usersApiSlice";
 import viteLogo from "/logo.jpg";
+import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import "../styles/navbar.css";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditProfile from "../mod/EditProfile";
-import { useCreateLogItemMutation } from "../slices/logApiSlice";
 
 const HideOnScroll = (props) => {
   const { children } = props;
@@ -49,13 +49,22 @@ const Navbar = () => {
   const [actionsOpen, setActionsOpen] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [openChangePassword, setOpenChangePassword] = useState(false);
-  const [schoolShortName, setSchoolShortName] = useState("ODASCO");
+  const [schoolShortName, setSchoolShortName] = useState("");
   const [schoolImage, setSchoolImage] = useState(viteLogo);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [admissionYear, setAdmissionYear] = useState(null);
   const { userInfo } = useSelector((state) => state.auth);
   const [openProfile, setOpenProfile] = useState(false);
-  const [createLogItem] = useCreateLogItemMutation();
+  const {
+    data: schoolItems,
+    isLoading,
+    isError,
+    error,
+  } = useGetSchoolItemsQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error.message}</div>;
+
 
   const dispatch = useDispatch();
   const [logoutApiCall] = useLogoutMutation();
@@ -70,6 +79,11 @@ const Navbar = () => {
 
   useEffect(() => {
     resetMenuState();
+    if (schoolItems && schoolItems.length > 0) {
+      const school = schoolItems[0];
+      setSchoolShortName(school.shortName || "");
+      setAdmissionYear(school.academicYear || "");
+    }
   }, []);
 
   const handleLogout = async () => {
@@ -159,7 +173,7 @@ const Navbar = () => {
               }}
             >
               {schoolShortName ? schoolShortName : ""}
-              {admissionYear && `[${admissionYear}]`}
+              {admissionYear && ` ${admissionYear}`}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
               {userInfo ? (

@@ -8,16 +8,18 @@ import {
   Avatar,
   IconButton,
 } from "@mui/material";
+import { LinearProgress } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera } from "@mui/icons-material";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
+import FixedProgressBar from "../helpers/FixedProgressBar";
 import {
   districts,
   regions,
   churches,
-  validNationalities, 
+  validNationalities,
 } from "../helpers/constants";
 import "../styles/editStudent.css";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +36,7 @@ const EditStudent = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [completionPercentage, setCompletionPercentage] = useState(0);
   const [indexNumber, setIndexNumber] = useState("");
   const [selectedHouse, setSelectedHouse] = useState("");
   const [rawScore, setRawScore] = useState("");
@@ -94,6 +97,71 @@ const EditStudent = () => {
     const date = new Date(dateString);
     return date.toISOString().split("T")[0]; // This will give you 'yyyy-MM-dd'
   };
+
+  const calculateCompletionPercentage = () => {
+    const fields = [
+      rawScore,
+      enrollmentCode,
+      jhsAttended,
+      jhsType,
+      placeOfBirth,
+      dateOfBirth,
+      nationality,
+      religion,
+      permanentAddress,
+      town,
+      region,
+      district,
+      interest,
+      ghanaCardNumber,
+      nHISNumber,
+      mobilePhone,
+      whatsappNumber,
+      email,
+      fathersName,
+      fathersOccupation,
+      mothersName,
+      mothersOccupation,
+      guardian,
+      residentialTelephone,
+      digitalAddress,
+    ];
+
+    const filledFields = fields.filter((field) => field !== "").length;
+    const totalFields = fields.length;
+
+    return Math.round((filledFields / totalFields) * 100);
+  };
+
+  useEffect(() => {
+    setCompletionPercentage(calculateCompletionPercentage());
+  }, [
+    rawScore,
+    enrollmentCode,
+    jhsAttended,
+    jhsType,
+    placeOfBirth,
+    dateOfBirth,
+    nationality,
+    religion,
+    permanentAddress,
+    town,
+    region,
+    district,
+    interest,
+    ghanaCardNumber,
+    nHISNumber,
+    mobilePhone,
+    whatsappNumber,
+    email,
+    fathersName,
+    fathersOccupation,
+    mothersName,
+    mothersOccupation,
+    guardian,
+    residentialTelephone,
+    digitalAddress,
+  ]);
 
   const getHouseName = (houseId) => {
     if (!houses) return "Loading...";
@@ -184,12 +252,49 @@ const EditStudent = () => {
     };
   }, [previewURL]);
 
+  const validateFields = () => {
+    const requiredFields = [
+      rawScore,
+      enrollmentCode,
+      jhsAttended,
+      jhsType,
+      placeOfBirth,
+      dateOfBirth,
+      nationality,
+      religion,
+      permanentAddress,
+      town,
+      region,
+      district,
+      interest,
+      ghanaCardNumber,
+      nHISNumber,
+      mobilePhone,
+      whatsappNumber,
+      fathersName,
+      fathersOccupation,
+      mothersName,
+      mothersOccupation,
+      guardian,
+    ];
+
+    return requiredFields.every((field) => field && field.trim() !== "");
+  };
   const handleSaveChanges = async () => {
     try {
       setIsSaving(true);
 
       if (!student.hasPaid) {
         setSnackbarMessage("Please Make payment first");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+        return;
+      }
+
+      if (!validateFields()) {
+        setSnackbarMessage(
+          "All fields are required. Please fill in all the information."
+        );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
         return;
@@ -301,6 +406,8 @@ const EditStudent = () => {
 
   return (
     <div className="edit-student">
+      <FixedProgressBar completionPercentage={completionPercentage} />
+
       <p className="title">
         PREVIOUS DETAILS
         <IconButton onClick={toggleWidgets} sx={{ p: 0 }}>
@@ -795,7 +902,6 @@ const EditStudent = () => {
           }}
         />
         <TextField
-          required
           type="number"
           label="Residential Telephone"
           variant="outlined"
@@ -808,7 +914,6 @@ const EditStudent = () => {
           }}
         />
         <TextField
-          required
           label="Digital Address"
           variant="outlined"
           fullWidth

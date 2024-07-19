@@ -15,6 +15,7 @@ const getSchoolItems = asyncHandler(async (req, res) => {
 // @access  Private
 const createSchoolItem = asyncHandler(async (req, res) => {
   const {
+    shortName,
     name,
     address,
     email,
@@ -43,6 +44,7 @@ const createSchoolItem = asyncHandler(async (req, res) => {
   } = req.body;
 
   const schoolItem = await School.create({
+    shortName,
     name,
     address,
     email,
@@ -83,6 +85,7 @@ const createSchoolItem = asyncHandler(async (req, res) => {
 // @access  Private
 const updateSchoolItem = asyncHandler(async (req, res) => {
   const {
+    shortName,
     name,
     address,
     email,
@@ -130,6 +133,7 @@ const updateSchoolItem = asyncHandler(async (req, res) => {
     schoolItem.email = email || schoolItem.email;
     schoolItem.headMasterName = headMasterName || schoolItem.headMasterName;
     schoolItem.box = box || schoolItem.box;
+    schoolItem.shortName = shortName || schoolItem.shortName;
     schoolItem.phone = phone || schoolItem.phone;
     schoolItem.helpDeskNo = helpDeskNo || schoolItem.helpDeskNo;
     schoolItem.year = year || schoolItem.year;

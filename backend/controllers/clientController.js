@@ -21,7 +21,6 @@ const authClient = asyncHandler(async (req, res) => {
       completed: student.completed,
     });
 
-    alert(student._id)
   } else {
     res.status(401);
     throw new Error("Invalid index Number");
