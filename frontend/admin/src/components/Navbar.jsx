@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Avatar from "@mui/material/Avatar";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Box } from "@mui/system";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -19,13 +20,12 @@ import Button from "@mui/material/Button";
 import { logout } from "../slices/authSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useLogoutMutation } from "../slices/usersApiSlice";
-import viteLogo from "/logo.jpg";
+import logo from "/logo.jpg";
 import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import "../styles/navbar.css";
-import CircularProgress from "@mui/material/CircularProgress";
 import EditProfile from "../mod/EditProfile";
 
 const HideOnScroll = (props) => {
@@ -50,24 +50,19 @@ const Navbar = () => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [openChangePassword, setOpenChangePassword] = useState(false);
   const [schoolShortName, setSchoolShortName] = useState("");
-  const [schoolImage, setSchoolImage] = useState(viteLogo);
+  const [schoolImage, setSchoolImage] = useState(logo);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [admissionYear, setAdmissionYear] = useState(null);
   const { userInfo } = useSelector((state) => state.auth);
   const [openProfile, setOpenProfile] = useState(false);
+  const dispatch = useDispatch();
+  const [logoutApiCall] = useLogoutMutation();
   const {
     data: schoolItems,
     isLoading,
     isError,
     error,
   } = useGetSchoolItemsQuery();
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error.message}</div>;
-
-
-  const dispatch = useDispatch();
-  const [logoutApiCall] = useLogoutMutation();
 
   const resetMenuState = () => {
     setDashboardOpen(false);
@@ -84,7 +79,10 @@ const Navbar = () => {
       setSchoolShortName(school.shortName || "");
       setAdmissionYear(school.academicYear || "");
     }
-  }, []);
+  }, [schoolItems]);
+
+  if (isLoading) return <CircularProgress />;
+  if (isError) return <div>Error</div>;
 
   const handleLogout = async () => {
     try {
@@ -128,13 +126,6 @@ const Navbar = () => {
 
   const handleMenuClose = () => {
     setMenuAnchor(null);
-  };
-
-  const handleOpenChangePassword = () => {
-    setOpenChangePassword(true);
-  };
-  const handleCloseChangePassword = () => {
-    setOpenChangePassword(false);
   };
 
   return (

@@ -33,9 +33,7 @@ const Users = () => {
   const createLog = useCreateLog();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [updating, setUpdating] = useState(false);
 
   const { data: users, isLoading, error, refetch } = useGetUsersQuery();
   const [toggleUserStatus] = useToggleUserStatusMutation();
@@ -52,18 +50,25 @@ const Users = () => {
 
     try {
       const result = await toggleUserStatus(userId).unwrap();
+      const updatedUser = users.find((user) => user._id === userId);
+
+      // Update the log message
+      const logAction = `User ${updatedUser.name} ${
+        result.status === "active" ? "activated" : "deactivated"
+      }`;
+
       refetch();
 
-      // Add log entry
+      // Add log entry with the new action message
       if (!ipLoading) {
-        await createLog("User Status Toggled", userId, locationIP);
+        await createLog(logAction, userInfo._id, locationIP);
       } else {
         console.log("IP address not available yet");
       }
 
       // Set Snackbar message and open it
       setSnackbarMessage(
-        `User status ${
+        `User ${updatedUser.name} ${
           result.status === "active" ? "activated" : "deactivated"
         } successfully.`
       );

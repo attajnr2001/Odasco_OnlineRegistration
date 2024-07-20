@@ -46,10 +46,6 @@ const Navbar = () => {
     isError,
     error,
   } = useGetSchoolItemsQuery();
-
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Please Login Again...</div>;
-
   const { clientInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [logoutApiCall] = useLogoutMutation();
@@ -60,7 +56,10 @@ const Navbar = () => {
       setSchoolShortName(school.shortName || "");
       setAdmissionYear(school.academicYear || "");
     }
-  }, []);
+  }, [schoolItems]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Please Login Again...</div>;
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
@@ -75,7 +74,7 @@ const Navbar = () => {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      setIsLoggingOut(false); // Set the loading state to false after the logout process is complete
+      setIsLoggingOut(false);
     }
   };
 

@@ -15,9 +15,9 @@ const ConfigLink = () => {
           <Dashboard />
         </NavLink>
 
-        <NavLink to="edit-student-dashboard" className="navLink">
+        {/* <NavLink to="edit-student-dashboard" className="navLink">
           <Person />
-        </NavLink>
+        </NavLink> */}
       </div>
     </div>
   );

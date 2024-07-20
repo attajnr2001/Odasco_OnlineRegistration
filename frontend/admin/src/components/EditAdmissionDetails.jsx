@@ -6,6 +6,7 @@ import {
   Alert,
   Grid,
   Snackbar,
+  CircularProgress,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 
@@ -32,8 +33,6 @@ const EditAdmissionDetails = () => {
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [reOpeningDate, setReOpeningDate] = useState("");
-  const [schOpeningDate, setSchOpeningDate] = useState("");
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertSeverity, setAlertSeverity] = useState("success");
   const [announcementTextFields, setAnnouncementTextFields] = useState([
@@ -72,6 +71,9 @@ const EditAdmissionDetails = () => {
     error,
   } = useGetSchoolItemsQuery();
   const [updateSchoolItem] = useUpdateSchoolItemMutation();
+
+  if (isLoading) return <CircularProgress />;
+  if (isError) return <div>Error, Please login again</div>;
 
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
@@ -146,23 +148,19 @@ const EditAdmissionDetails = () => {
         ...prevData,
         admissionStatus: newAdmissionStatus,
       }));
-      
+
       // Add log entry
-      if (!ipLoading) {
-        await createLog(
-          "Admission Details Updated",
-          schoolItems[0]._id,
-          locationIP
-        );
+      if (!ipLoading && userInfo && userInfo._id) {
+        await createLog("School Details Updated", userInfo._id, locationIP);
       } else {
-        console.log("IP address not available yet");
+        console.log("IP address not available yet or user info is missing");
       }
 
       setAlertMessage("Admission details updated successfully!");
       setAlertSeverity("success");
     } catch (error) {
       console.error("Error updating admission details:", error);
-      setAlertMessage("Error updating admission details: " + error.message);
+      setAlertMessage("Error updating admission details");
       setAlertSeverity("error");
     } finally {
       setIsUpdating(false);
@@ -212,20 +210,8 @@ const EditAdmissionDetails = () => {
         />
 
         <TextField
-          label="Admission Year"
-          type="text"
-          fullWidth
-          value={admissionData.year}
-          onChange={(e) => handleTextFieldChange("year", e.target.value)}
-          margin="normal"
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-
-        <TextField
           label="Academic Year"
-          type="text"
+          type="number"
           fullWidth
           value={admissionData.academicYear}
           onChange={(e) =>

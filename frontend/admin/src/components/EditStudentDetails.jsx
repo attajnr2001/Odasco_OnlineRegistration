@@ -77,14 +77,10 @@ const EditStudentDetails = () => {
       }).unwrap();
 
       // Add log entry
-      if (!ipLoading) {
-        await createLog(
-          "Student Details Updated",
-          schoolItems[0]._id,
-          locationIP
-        );
+      if (!ipLoading && userInfo && userInfo._id) {
+        await createLog("School Details Updated", userInfo._id, locationIP);
       } else {
-        console.log("IP address not available yet");
+        console.log("IP address not available yet or user info is missing");
       }
 
       setAlertMessage("Student details updated successfully!");

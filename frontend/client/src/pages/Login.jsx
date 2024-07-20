@@ -106,7 +106,6 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 
 const Login = () => {
   const [expanded, setExpanded] = useState("panel1");
-  const { schoolID } = useParams();
   const [error, setError] = useState("");
   const [indexNumber, setIndexNumber] = useState("");
   const [loading, setLoading] = useState(false);
@@ -171,7 +170,7 @@ const Login = () => {
 
     const payStack = new PaystackPop();
     payStack.newTransaction({
-      key: process.env.PAYSTACK_LIVE_KEY,
+      key: process.env.PAYSTACK_TEST_KEY,
       amount: school.serviceCharge * 100,
       email: "attajnr731@gmail.com",
       onSuccess: () => handlePaymentSuccess(studentData),
@@ -300,7 +299,7 @@ const Login = () => {
             onClick={handleLogin}
             sx={{
               my: "10px",
-              color: "white", // This sets the text color to white
+              color: "white", 
             }}
             disabled={loading}
           >

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
+import NetworkStatusWarning from "../helpers/NetworkStatusWarning";
 import {
   Button,
   Dialog,
@@ -10,20 +10,16 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
 import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useAddUserMutation } from "../slices/usersApiSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-
 const AddUserModal = ({ open, onClose, onAddUser }) => {
-  const [error, setError] = useState(null);
   const { userInfo } = useSelector((state) => state.auth);
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [currentDateTime, setCurrentDateTime] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -43,7 +39,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
       return;
     }
     try {
-      const result = await addUser({
+      await addUser({
         name,
         email,
         password,
@@ -52,7 +48,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
       }).unwrap();
 
       if (!ipLoading) {
-        await createLog("New User Added", result._id, locationIP);
+        await createLog("New User Added", userInfo._id, locationIP);
       } else {
         console.log("IP address not available yet");
       }

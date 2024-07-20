@@ -45,7 +45,7 @@ const EditSchoolDetails = () => {
   }, [schoolItems]);
 
   if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error.message}</div>;
+  if (isError) return <div>Error, Please re login</div>;
 
   const handleSubmit = async () => {
     if (isUpdating) return;
@@ -69,22 +69,16 @@ const EditSchoolDetails = () => {
       }).unwrap();
 
       // Add log entry
-      if (!ipLoading) {
-        await createLog(
-          "School Details Updated",
-          schoolItems[0]._id,
-          locationIP
-        );
+      if (!ipLoading && userInfo && userInfo._id) {
+        await createLog("School Details Updated", userInfo._id, locationIP);
       } else {
-        console.log("IP address not available yet");
+        console.log("IP address not available yet or user info is missing");
       }
-
       setSnackbarMessage("School details updated successfully!");
       setSnackbarSeverity("success");
     } catch (error) {
       console.error("Error updating school details:", error);
-      setSnackbarMessage("Error updating school details: " + error.message);
-      setSnackbarSeverity("error");
+      setSnackbarMessage("Error updating school details");
     } finally {
       setIsUpdating(false);
       setSnackbarOpen(true);
