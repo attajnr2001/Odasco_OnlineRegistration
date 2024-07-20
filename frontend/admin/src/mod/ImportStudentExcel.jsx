@@ -44,6 +44,7 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
       }
     }
   };
+ 
 
   const handleUpload = async () => {
     if (excelFile) {
@@ -55,25 +56,30 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
         const data = XLSX.utils.sheet_to_json(worksheet);
 
         if (data) {
-          const studentsToSave = data.map((student) => ({
-            aggregate: student["Aggregate"] || "",
-            dateOfBirth: student["Date of Birth(dd/mm/yyyy)"] || "",
-            otherNames: student["Other Names"] || "",
-            gender:
-              (student["Gender"] || "").charAt(0).toUpperCase() +
-              (student["Gender"] || "").slice(1).toLowerCase(),
-            jhsAttended: student["JHS Attended"] || "",
-            indexNumber: student["JHS Index No"],
-            surname: student["Surname"] || "",
-            program: (student["Programme"] || "").toUpperCase(),
-            smsContact: student["SMS Contact"] || "",
-            status:
-              (student["Boarding Status"] || "Day").charAt(0).toUpperCase() +
-              (student["Boarding Status"] || "Day").slice(1).toLowerCase(),
-            completed: false,
-            hasPaid: false,
-            year: studentYear,
-          }));
+          const studentsToSave = data
+            .filter((student) =>
+              // Check if the row has any data other than S/N
+              Object.keys(student).some((key) => key !== "S/N" && student[key])
+            )
+            .map((student) => ({
+              aggregate: student["Aggregate"] || "",
+              dateOfBirth: student["Date of Birth(dd/mm/yyyy)"] || "",
+              otherNames: student["Other Names"] || "",
+              gender:
+                (student["Gender"] || "").charAt(0).toUpperCase() +
+                (student["Gender"] || "").slice(1).toLowerCase(),
+              jhsAttended: student["JHS Attended"] || "",
+              indexNumber: student["JHS Index No"],
+              surname: student["Surname"] || "",
+              program: (student["Programme"] || "").toUpperCase(),
+              smsContact: student["SMS Contact"] || "",
+              status:
+                (student["Boarding Status"] || "Day").charAt(0).toUpperCase() +
+                (student["Boarding Status"] || "Day").slice(1).toLowerCase(),
+              completed: false,
+              hasPaid: false,
+              year: studentYear,
+            }));
 
           // Create a map of program names to program IDs
           const programMap = programs.reduce((acc, program) => {
@@ -121,12 +127,7 @@ const ImportStudentExcel = ({ open, onClose, programs, schoolID }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Import Student Excel</DialogTitle>
       <DialogContent>
-        <a
-          href={
-            "https://firebasestorage.googleapis.com/v0/b/shsreg-bb2a1.appspot.com/o/student%20temp%20(4).xlsx?alt=media&token=9da2c73c-bf9e-4994-a4fa-a6f8ae97163f"
-          }
-          download
-        >
+        <a href={process.env.STUDENT_EXCEL_TEMP} download>
           <Button variant="contained" size="small" color="primary">
             Download Template
           </Button>
