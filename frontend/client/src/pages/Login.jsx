@@ -151,7 +151,7 @@ const Login = () => {
         if (res.completed) {
           navigate(`/dashboard`);
         } else {
-          navigate(`/dashboard/edit-student`);
+          navigate(`/edit-student`);
         }
       }
     } catch (err) {
@@ -185,7 +185,7 @@ const Login = () => {
     try {
       const result = await updatePaymentStatus(studentData._id).unwrap();
       dispatch(setCredentials(result));
-      navigate(`/dashboard/edit-student`);
+      navigate(`/edit-student`);
     } catch (error) {
       setMessage("Error updating payment status");
       setOpen(true);
@@ -299,7 +299,7 @@ const Login = () => {
             onClick={handleLogin}
             sx={{
               my: "10px",
-              color: "white", 
+              color: "white",
             }}
             disabled={loading}
           >

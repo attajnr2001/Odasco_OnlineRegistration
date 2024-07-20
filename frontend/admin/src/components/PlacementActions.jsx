@@ -29,7 +29,7 @@ import ImportStudentExcel from "../mod/ImportStudentExcel";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { visuallyHidden } from "@mui/utils";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import {
   useGetStudentItemsQuery,
   useUpdateStudentItemMutation,
@@ -38,7 +38,10 @@ import {
   useGetRecentStudentsQuery,
 } from "../slices/studentApiSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useGetProgramItemsQuery } from "../slices/programApiSlice";
+import {
+  useGetProgramItemsQuery,
+  useUpdateProgramItemMutation,
+} from "../slices/programApiSlice";
 
 const PlacementActions = () => {
   const [page, setPage] = useState(0);
@@ -53,19 +56,22 @@ const PlacementActions = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const locationIP = useLocationIP();
+  const { locationIP, loading: ipLoading } = useLocationIP();
   const { userInfo } = useSelector((state) => state.auth);
+  const createLog = useCreateLog();
 
   const {
     data: studentItems,
     isLoading,
     isError,
     error,
- a } = useGetStudentItemsQuery();
-   const { data: recentStudents, isLoading: isLoadingRecent } =
+    a,
+  } = useGetStudentItemsQuery();
+  const { data: recentStudents, isLoading: isLoadingRecent } =
     useGetRecentStudentsQuery();
   const [deleteUnregisteredStudents, { isLoading: isDeleting }] =
     useDeleteUnregisteredStudentsMutation();
+  const [updateProgramItem] = useUpdateProgramItemMutation();
 
   const { data: programs, isLoading: programsLoading } =
     useGetProgramItemsQuery();
@@ -196,6 +202,23 @@ const PlacementActions = () => {
         setSnackbarMessage(result.message);
         setSnackbarOpen(true);
         setAlertSeverity("success");
+
+        // Update program noOfStudents
+        for (const { _id: programId, count } of result.deletedCounts) {
+          const program = programs.find((p) => p._id === programId);
+          if (program) {
+            await updateProgramItem({
+              id: programId,
+              noOfStudents: program.noOfStudents - count,
+            });
+          }
+        }
+
+        if (!ipLoading) {
+          await createLog(`Unregistered Students Deleted`, userInfo._id, locationIP);
+        } else {
+          console.log("IP address not available yet");
+        }
       } catch (error) {
         console.error("Error deleting unregistered students:", error);
         setSnackbarMessage(

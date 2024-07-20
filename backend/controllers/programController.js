@@ -16,7 +16,7 @@ const getProgramItems = asyncHandler(async (req, res) => {
 const createProgramItem = asyncHandler(async (req, res) => {
   const { name, programID, noOfStudents, shortName } = req.body;
   res.send(req.body);
-  console.log(req.body)
+  console.log(req.body);
 
   if (!programID) {
     res.status(400);

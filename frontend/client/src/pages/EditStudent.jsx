@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   TextField,
   Snackbar,
@@ -8,7 +8,6 @@ import {
   Avatar,
   IconButton,
 } from "@mui/material";
-import { LinearProgress } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { motion, AnimatePresence } from "framer-motion";
@@ -71,20 +70,21 @@ const EditStudent = () => {
   const [form, setForm] = useState(null);
   const [previewURL, setPreviewURL] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [showPersonalRecords, setShowPersonalRecords] = useState(false);
+  const [showPersonalRecords, setShowPersonalRecords] = useState(true);
   const [photoUploaded, setPhotoUploaded] = useState(true); // New state
   const navigate = useNavigate();
   const [updateStudentItem, { isLoading: isUpdating }] =
     useUpdateStudentItemMutation();
-
   const [student, setStudent] = useState({});
   const { clientInfo } = useSelector((state) => state.auth);
   const [getStudentDetails] = useGetStudentDetailsMutation();
   const { data: programs, isLoading: programsLoading } =
     useGetProgramItemsQuery();
-
   const { data: houses, isLoading: housesLoading } = useGetHouseItemsQuery();
   const [updateHouseItem] = useUpdateHouseItemMutation();
+  const [showProgressBar, setShowProgressBar] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const lastScrollTop = useRef(0);
 
   const getProgramName = (programId) => {
     if (!programs) return "Loading...";
@@ -98,10 +98,33 @@ const EditStudent = () => {
     return date.toISOString().split("T")[0]; // This will give you 'yyyy-MM-dd'
   };
 
-  const calculateCompletionPercentage = () => {
-    const fields = [
+  const getHouseName = (houseId) => {
+    if (!houses) return "Loading...";
+    const house = houses.find((h) => h._id === houseId);
+    return house ? house.name : "Unknown Program";
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const st = window.pageYOffset || document.documentElement.scrollTop;
+      if (st > lastScrollTop.current) {
+        setShowProgressBar(false);
+      } else {
+        setShowProgressBar(true);
+      }
+      lastScrollTop.current = st <= 0 ? 0 : st;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const calculateProgress = () => {
+    const totalFields = 25; // Update this number based on your actual number of fields
+    const filledFields = [
       rawScore,
       enrollmentCode,
+      enrollmentForm,
       jhsAttended,
       jhsType,
       placeOfBirth,
@@ -117,7 +140,6 @@ const EditStudent = () => {
       nHISNumber,
       mobilePhone,
       whatsappNumber,
-      email,
       fathersName,
       fathersOccupation,
       mothersName,
@@ -125,19 +147,18 @@ const EditStudent = () => {
       guardian,
       residentialTelephone,
       digitalAddress,
-    ];
+    ].filter((field) => field && field.trim() !== "").length;
 
-    const filledFields = fields.filter((field) => field !== "").length;
-    const totalFields = fields.length;
-
-    return Math.round((filledFields / totalFields) * 100);
+    const newProgress = (filledFields / totalFields) * 100;
+    setProgress(newProgress);
   };
 
   useEffect(() => {
-    setCompletionPercentage(calculateCompletionPercentage());
+    calculateProgress();
   }, [
     rawScore,
     enrollmentCode,
+    enrollmentForm,
     jhsAttended,
     jhsType,
     placeOfBirth,
@@ -153,7 +174,6 @@ const EditStudent = () => {
     nHISNumber,
     mobilePhone,
     whatsappNumber,
-    email,
     fathersName,
     fathersOccupation,
     mothersName,
@@ -162,12 +182,6 @@ const EditStudent = () => {
     residentialTelephone,
     digitalAddress,
   ]);
-
-  const getHouseName = (houseId) => {
-    if (!houses) return "Loading...";
-    const house = houses.find((h) => h._id === houseId);
-    return house ? house.name : "Unknown Program";
-  };
 
   useEffect(() => {
     const fetchStudentDetails = async () => {
@@ -255,6 +269,7 @@ const EditStudent = () => {
   const validateFields = () => {
     const requiredFields = [
       rawScore,
+      enrollmentForm,
       enrollmentCode,
       jhsAttended,
       jhsType,
@@ -406,7 +421,7 @@ const EditStudent = () => {
 
   return (
     <div className="edit-student">
-      <FixedProgressBar completionPercentage={completionPercentage} />
+      {showProgressBar && <FixedProgressBar progress={progress} />}
 
       <p className="title">
         PREVIOUS DETAILS

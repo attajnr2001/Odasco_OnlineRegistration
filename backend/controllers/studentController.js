@@ -4,7 +4,7 @@ import Student from "../models/Student.js";
 import Program from "../models/Program.js";
 import multer from "multer";
 import path from "path";
-import fs from 'fs';
+import fs from "fs";
 
 // @desc    Get all student items
 // @route   GET /api/student
@@ -199,18 +199,32 @@ const deleteStudentItem = asyncHandler(async (req, res) => {
 // @route   DELETE /api/students/unregistered
 // @access  Private
 const deleteUnregisteredStudents = asyncHandler(async (req, res) => {
+  // Count deleted students per program
+  const deletedCounts = await Student.aggregate([
+    { $match: { completed: false } },
+    { $group: { _id: "$program", count: { $sum: 1 } } },
+  ]);
+
+  // Delete unregistered students
   const result = await Student.deleteMany({ completed: false });
+
+  // Update program noOfStudents
+  for (const { _id: programId, count } of deletedCounts) {
+    await Program.findByIdAndUpdate(programId, {
+      $inc: { noOfStudents: -count },
+    });
+  }
 
   if (result.deletedCount > 0) {
     res.json({
       message: `${result.deletedCount} unregistered students deleted`,
+      deletedCounts,
     });
   } else {
     res.status(404);
     throw new Error("No unregistered students found");
   }
 });
-
 
 export {
   getStudentItems,
