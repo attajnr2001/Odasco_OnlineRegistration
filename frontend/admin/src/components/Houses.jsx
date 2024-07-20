@@ -28,7 +28,8 @@ import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { visuallyHidden } from "@mui/utils";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import {
   useGetHouseItemsQuery,
   useAddHouseItemMutation,
@@ -42,7 +43,6 @@ const Houses = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
-  const locationIP = useLocationIP();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -50,6 +50,9 @@ const Houses = () => {
   const [orderBy, setOrderBy] = useState("name");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { userInfo } = useSelector((state) => state.auth);
+  const { locationIP, loading: ipLoading } = useLocationIP();
+  const createLog = useCreateLog();
   const {
     data: houseItems,
     isLoading,
@@ -86,6 +89,13 @@ const Houses = () => {
 
     try {
       await deleteHouseItem(selectedRow._id).unwrap();
+
+      if (!ipLoading) {
+        await createLog(`${selectedRow.name} House Deleted`, userInfo._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
+
       setSnackbarMessage("House deleted successfully");
       setSnackbarSeverity("success");
       setOpenSnackbar(true);

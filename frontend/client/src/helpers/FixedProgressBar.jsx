@@ -31,7 +31,7 @@ const FixedProgressBar = ({ completionPercentage }) => {
           top: "5rem",
           left: 0,
           right: 0,
-          zIndex: 9999,
+          zIndex: 99,
           backgroundColor: "transparent",
           padding: "5px 10px",
         }}

@@ -27,10 +27,9 @@ const App = () => {
           </Route>
 
           <Route path="login" element={<Login />} />
-          <Route path="dashboard" element={<MainLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="edit-student" element={<EditStudent />} />
-          </Route>
+          <Route path="dashboard" element={<Dashboard />} />
+          {/* <Route index element={<Dashboard />} /> */}
+          <Route path="edit-student" element={<EditStudent />} />
         </Route>
       </>
     )

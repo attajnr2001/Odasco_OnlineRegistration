@@ -11,12 +11,13 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useAddHouseItemMutation } from "../slices/houseApiSlice";
 
 const AddHouseModal = ({ open, onClose, onAddHouse }) => {
   const [addHouseItem, { isLoading }] = useAddHouseItemMutation();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -51,16 +52,21 @@ const AddHouseModal = ({ open, onClose, onAddHouse }) => {
 
       // Add log entry
       if (!ipLoading) {
-        await createLog("New House Added", result._id, locationIP);
+        await createLog(
+          `New House Added - ${formData.name}`,
+          userInfo._id,
+          locationIP
+        );
       } else {
         console.log("IP address not available yet");
       }
 
       setSnackbarMessage("House added successfully");
       setSnackbarOpen(true);
-      onClose();
     } catch (err) {
       setError(err.data?.message || err.error);
+    } finally {
+      onClose();
     }
   };
 

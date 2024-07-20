@@ -10,9 +10,9 @@ import {
   Alert,
 } from "@mui/material";
 import NetworkStatusWarning from "../helpers/NetworkStatusWarning"; // Import the component
-import { useParams } from "react-router-dom";
-import { useLocationIP, getPlatform } from "../helpers/utils";
+import { useLocationIP, useCreateLog } from "../helpers/utils";
 import { useUpdateHouseItemMutation } from "../slices/houseApiSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const EditHouseModal = ({ open, onClose, rowData }) => {
   const [updateHouseItem, { isLoading }] = useUpdateHouseItemMutation();
@@ -22,11 +22,12 @@ const EditHouseModal = ({ open, onClose, rowData }) => {
     gender: "",
     bedCapacity: "",
   });
-
+  const { userInfo } = useSelector((state) => state.auth);
+  const createLog = useCreateLog();
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const locationIP = useLocationIP();
+  const { locationIP, loading: ipLoading } = useLocationIP();
 
   useEffect(() => {
     if (rowData) {
@@ -55,6 +56,12 @@ const EditHouseModal = ({ open, onClose, rowData }) => {
         noOfStudents: parseInt(formData.noOfStudents),
         bedCapacity: parseInt(formData.bedCapacity),
       }).unwrap();
+
+      if (!ipLoading) {
+        await createLog(`House ${formData.name} updated`, userInfo._id, locationIP);
+      } else {
+        console.log("IP address not available yet");
+      }
 
       setSnackbarMessage("House updated successfully!");
       setSnackbarSeverity("success");

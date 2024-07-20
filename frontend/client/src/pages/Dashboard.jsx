@@ -207,7 +207,7 @@ const Dashboard = () => {
               color="primary"
               component={Link}
               size="small"
-              to={"edit-student"}
+              to={"/edit-student"}
             >
               Edit
             </Button>

@@ -146,6 +146,7 @@ const Navbar = () => {
                 fontWeight: "bold",
                 flexGrow: 1,
                 textTransform: "uppercase",
+                display: {xs: "none", md: "block"}
               }}
             >
               ONLINE REGISTRATION

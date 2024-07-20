@@ -48,7 +48,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
       }).unwrap();
 
       if (!ipLoading) {
-        await createLog("New User Added", userInfo._id, locationIP);
+        await createLog(`New User Added - ${name}`, userInfo._id, locationIP);
       } else {
         console.log("IP address not available yet");
       }

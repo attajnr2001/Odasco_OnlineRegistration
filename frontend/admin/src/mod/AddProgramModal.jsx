@@ -12,11 +12,13 @@ import {
 import { useParams } from "react-router-dom";
 import { useLocationIP, getPlatform, useCreateLog } from "../helpers/utils";
 import { useAddProgramItemMutation } from "../slices/programApiSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const AddProgramModal = ({ open, onClose, onAddProgram }) => {
   const [addProgramItem, { isLoading }] = useAddProgramItemMutation();
   const createLog = useCreateLog();
   const { locationIP, loading: ipLoading } = useLocationIP();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     programID: "",
@@ -57,7 +59,7 @@ const AddProgramModal = ({ open, onClose, onAddProgram }) => {
       onAddProgram(result);
 
       if (!ipLoading) {
-        await createLog("Program added", result._id, locationIP);
+        await createLog(`New Program Added - ${formData.name}`, userInfo._id, locationIP);
       } else {
         console.log("IP address not available yet");
       }
@@ -66,7 +68,7 @@ const AddProgramModal = ({ open, onClose, onAddProgram }) => {
       setTimeout(() => {
         onClose();
         setSuccess(null);
-      }, 2000);
+      }, 1000);
     } catch (err) {
       setError(err.data?.message || err.error);
     }

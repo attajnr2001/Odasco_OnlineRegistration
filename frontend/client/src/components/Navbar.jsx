@@ -78,6 +78,25 @@ const Navbar = () => {
     }
   };
 
+  const activeStyle = {
+    backgroundColor: "#2bd918",
+    color: "#fff",
+    fontWeight: "bold",
+  };
+
+  const NavButton = ({ to, children }) => (
+    <Button
+      component={NavLink}
+      to={to}
+      sx={{
+        color: "black",
+        "&.active": activeStyle,
+      }}
+    >
+      {children}
+    </Button>
+  );
+
   return (
     <>
       <HideOnScroll>
@@ -122,53 +141,16 @@ const Navbar = () => {
             <Box sx={{ display: { xs: "none", md: "flex" }, gap: "10px" }}>
               {clientInfo ? (
                 <>
-                  <Button
-                    component={NavLink}
-                    to={`/dashboard`}
-                    sx={{ color: "black" }}
-                    className={({ isActive }) =>
-                      isActive ? "nav-link-active" : "nav-link"
-                    }
-                  >
-                    DASHBOARD{" "}
-                  </Button>
-                  <Button
-                    component={NavLink}
-                    to={`/dashboard/edit-student`}
-                    sx={{ color: "black" }}
-                    className={({ isActive }) =>
-                      isActive ? "nav-link-active" : "nav-link"
-                    }
-                  >
-                    EDIT STUDENT
-                  </Button>
+                  <NavButton to="/dashboard">DASHBOARD</NavButton>
+                  <NavButton to="/edit-student">EDIT STUDENT</NavButton>
                   <Button sx={{ color: "black" }} onClick={handleLogout}>
                     {isLoggingOut ? <CircularProgress size={20} /> : "LOGOUT"}
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button
-                    component={NavLink}
-                    to="/"
-                    sx={{ color: "black" }}
-                    className={({ isActive }) =>
-                      isActive ? "nav-link-active" : "nav-link"
-                    }
-                  >
-                    HOME
-                  </Button>
-
-                  <Button
-                    component={NavLink}
-                    to="/contact"
-                    sx={{ color: "black" }}
-                    className={({ isActive }) =>
-                      isActive ? "nav-link-active" : "nav-link"
-                    }
-                  >
-                    CONTACT US
-                  </Button>
+                  <NavButton to="/">HOME</NavButton>
+                  <NavButton to="/contact">CONTACT US</NavButton>
                 </>
               )}
             </Box>
@@ -191,7 +173,7 @@ const Navbar = () => {
         sx={{ display: { xs: "block", md: "none" } }}
       >
         <Box
-          sx={{ width: 250 }}
+          sx={{ width: 250, zIndex: 999 }}
           role="presentation"
           onClick={handleMenuToggle}
           onKeyDown={handleMenuToggle}
@@ -201,10 +183,12 @@ const Navbar = () => {
               <>
                 <ListItemButton
                   component={NavLink}
-                  to={`/dashboard`}
+                  to="/dashboard"
                   sx={(theme) => ({
-                    "&.nav-link-active": {
+                    "&.active": {
                       backgroundColor: theme.palette.action.selected,
+                      borderLeft: `4px solid ${theme.palette.primary.main}`,
+                      fontWeight: "bold",
                     },
                   })}
                 >
@@ -212,23 +196,18 @@ const Navbar = () => {
                 </ListItemButton>
                 <ListItemButton
                   component={NavLink}
-                  to={`/dashboard/edit-student`}
+                  to="/edit-student"
                   sx={(theme) => ({
-                    "&.nav-link-active": {
+                    "&.active": {
                       backgroundColor: theme.palette.action.selected,
+                      borderLeft: `4px solid ${theme.palette.primary.main}`,
+                      fontWeight: "bold",
                     },
                   })}
                 >
                   <ListItemText primary="EDIT STUDENT" />
                 </ListItemButton>
-                <ListItemButton
-                  onClick={handleLogout}
-                  sx={(theme) => ({
-                    "&.nav-link-active": {
-                      backgroundColor: theme.palette.action.selected,
-                    },
-                  })}
-                >
+                <ListItemButton onClick={handleLogout}>
                   <ListItemText
                     primary={
                       isLoggingOut ? <CircularProgress size={20} /> : "LOGOUT"
@@ -242,20 +221,23 @@ const Navbar = () => {
                   component={NavLink}
                   to="/"
                   sx={(theme) => ({
-                    "&.nav-link-active": {
+                    "&.active": {
                       backgroundColor: theme.palette.action.selected,
+                      borderLeft: `4px solid ${theme.palette.primary.main}`,
+                      fontWeight: "bold",
                     },
                   })}
                 >
                   <ListItemText primary="HOME" />
                 </ListItemButton>
-
                 <ListItemButton
                   component={NavLink}
                   to="/contact"
                   sx={(theme) => ({
-                    "&.nav-link-active": {
+                    "&.active": {
                       backgroundColor: theme.palette.action.selected,
+                      borderLeft: `4px solid ${theme.palette.primary.main}`,
+                      fontWeight: "bold",
                     },
                   })}
                 >
