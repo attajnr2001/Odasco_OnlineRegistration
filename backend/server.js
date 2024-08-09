@@ -8,7 +8,7 @@ import userRoutes from "./routes/userRoutes.js";
 import houseRoutes from "./routes/houseRoutes.js";
 import programRoutes from "./routes/programRoutes.js";
 import schoolRoutes from "./routes/schoolRoutes.js";
-import studentRoutes from "./routes/studentRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js"; 
 import clientRoutes from "./routes/clientRoutes.js";
 import logRoutes from "./routes/logRoutes.js";
 import pdfRoutes from "./routes/pdfRoutes.js";

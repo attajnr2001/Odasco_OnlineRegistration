@@ -28,6 +28,7 @@ import {
 } from "react-router-dom";
 import store from "./store";
 import { Provider } from "react-redux";
+import ProtectedRoute from "./components/ProtectedRoute"; // Add this import
 
 const App = () => {
   const router = createBrowserRouter(
@@ -35,29 +36,35 @@ const App = () => {
       <Route errorElement={<Error />}>
         <Route path="" element={<Welcome />} />
         <Route path="login" element={<Login />} />
-        <Route path="admin" element={<RootLayout />}>
-          <Route path="dashboard" element={<Dashboard />}>
-            <Route path="admin-config" element={<AdminConfig />}>
-              <Route path="edit-sch-details" element={<EditSchoolDetails />} />
-              <Route
-                path="edit-admission-details"
-                element={<EditAdmissionDetails />}
-              />
-              <Route
-                path="edit-student-dashboard"
-                element={<EditStudentDetails />}
-              />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="admin" element={<RootLayout />}>
+            <Route path="dashboard" element={<Dashboard />}>
+              <Route path="admin-config" element={<AdminConfig />}>
+                <Route
+                  path="edit-sch-details"
+                  element={<EditSchoolDetails />}
+                />
+                <Route
+                  path="edit-admission-details"
+                  element={<EditAdmissionDetails />}
+                />
+                <Route
+                  path="edit-student-dashboard"
+                  element={<EditStudentDetails />}
+                />
+              </Route>
+              <Route path="user-setup" element={<Users />} />
+              <Route path="houses" element={<Houses />} />
+              <Route path="programs" element={<Programs />} />
+              <Route path="admin-docs" element={<AdmissionDocument />} />
+              <Route path="logs" element={<Logs />} />
+              <Route path="placement-actions" element={<PlacementActions />} />
+              <Route path="view-students" element={<ViewStudent />} />
+              <Route path="manage-student" element={<ManageStudent />} />
+              <Route path="delete-database" element={<DeleteDatabase />} />
+              <Route path="house-allocations" element={<HouseAllocations />} />
             </Route>
-            <Route path="user-setup" element={<Users />} />
-            <Route path="houses" element={<Houses />} />
-            <Route path="programs" element={<Programs />} />
-            <Route path="admin-docs" element={<AdmissionDocument />} />
-            <Route path="logs" element={<Logs />} />
-            <Route path="placement-actions" element={<PlacementActions />} />
-            <Route path="view-students" element={<ViewStudent />} />
-            <Route path="manage-student" element={<ManageStudent />} />
-            <Route path="delete-database" element={<DeleteDatabase />} />
-            <Route path="house-allocations" element={<HouseAllocations />} />
           </Route>
         </Route>
         <Route path="*" element={<Error />} />
