@@ -25,6 +25,7 @@ const allowedOrigins = [
   "https://odasco-onlineregistration-admin.onrender.com",
   "http://localhost:3000", // Assuming your Vite dev server runs on port 3000
   "http://localhost:5173", // Another common Vite dev server port
+  "http://localhost:5174", // Another common Vite dev server port
 ];
 
 const corsOptions = {
