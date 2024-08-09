@@ -21,8 +21,20 @@ const app = express();
 
 app.use(express.json());
 
+const allowedOrigins = [
+  "https://odasco-onlineregistration-admin.onrender.com",
+  "http://localhost:3000", // Assuming your Vite dev server runs on port 3000
+  "http://localhost:5173", // Another common Vite dev server port
+];
+
 const corsOptions = {
-  origin: "https://odasco-onlineregistration-admin.onrender.com",
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 
