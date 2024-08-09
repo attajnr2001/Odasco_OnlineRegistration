@@ -12,8 +12,14 @@ import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import bg from "/osco back.webp";
 
 const Welcome = () => {
-  const { data: schoolItems, isLoading: isLoadingSchool } =
-    useGetSchoolItemsQuery();
+  const {
+    data: schoolItems,
+    isLoading: isLoadingSchool,
+    error,
+  } = useGetSchoolItemsQuery();
+  console.log("School Items:", schoolItems);
+  console.log("Loading:", isLoadingSchool);
+  console.log("Error:", error);
 
   const school = schoolItems?.[0];
 
