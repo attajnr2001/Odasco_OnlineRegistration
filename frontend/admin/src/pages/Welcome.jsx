@@ -17,6 +17,22 @@ const Welcome = () => {
 
   const school = schoolItems?.[0];
 
+  if (isLoadingSchool) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return (
+      <Typography color="error">
+        Error loading school data. Please try again later.
+      </Typography>
+    );
+  }
+
+  if (!school) {
+    return <Typography>No school data available.</Typography>;
+  }
+
   return (
     <Box
       sx={{
