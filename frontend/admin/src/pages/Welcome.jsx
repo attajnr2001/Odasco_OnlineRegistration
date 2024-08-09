@@ -12,32 +12,23 @@ import { useGetSchoolItemsQuery } from "../slices/schoolApiSlice";
 import bg from "/osco back.webp";
 
 const Welcome = () => {
-  const {
-    data: schoolItems,
-    isLoading: isLoadingSchool,
-    error,
-  } = useGetSchoolItemsQuery();
-  console.log("School Items:", schoolItems);
-  console.log("Loading:", isLoadingSchool);
-  console.log("Error:", error);
+  const { data: schoolItems, isLoading, error } = useGetSchoolItemsQuery();
 
-  const school = schoolItems?.[0];
+  console.log("API Response:", { schoolItems, isLoading, error });
 
-  if (isLoadingSchool) {
-    return <CircularProgress />;
-  }
-
+  if (isLoading) return <CircularProgress />;
   if (error) {
+    console.error("API Error:", error);
     return (
       <Typography color="error">
-        Error loading school data. Please try again later.
+        Error: {error.error || "Failed to fetch school data"}
       </Typography>
     );
   }
-
-  if (!school) {
+  if (!schoolItems || schoolItems.length === 0)
     return <Typography>No school data available.</Typography>;
-  }
+
+  const school = schoolItems[0];
 
   return (
     <Box
@@ -75,7 +66,7 @@ const Welcome = () => {
           alignItems: "center",
         }}
       >
-        {isLoadingSchool ? (
+        {isLoading ? (
           <CircularProgress />
         ) : (
           <>
