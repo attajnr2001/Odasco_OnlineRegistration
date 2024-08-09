@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         "/api": {
-          target: "http://localhost:3000",
+          target: "https://odasco-onlineregistration.onrender.com",
           changeOrigin: true,
         },
       },
